@@ -1,30 +1,55 @@
 <#
 .SYNOPSIS
-    .
+    Extracts a specified set of columns from a database into ".bcp" file(s).
 .DESCRIPTION
-    .
+    Extracts a speciified set of columns from a database into ".bcp" file(s),
+    with one file per table.  The set of columns to be extracted is determined by
+    a query to be run on the specified server within the context of the specified
+    database. The query should return a single result set consisting of three
+    columns in the following order: "schema_name", "table_or_view_name", and
+    "column_name". (the columns may be assigned different aliases, so long as the
+    contents and their order is the same) The name entries should be unqualified
+    and unquoted.
+
+    The query may comprise a sequence of statements than a true
+    "pure" query. However, the query should *not* execute `SET NOCOUNT OFF`; otherwise,
+    undefined behavior may result.
+
+    This script is unsigned as of 2018-07-02. As such, in order to execute, it
+    should either be "unblocked" with Unblock-File or the sessions' execution
+    policy should be set to "Remote Signed" with Set-ExecutionPolicy.
 .PARAMETER Database
-    db_name
+    The unqualified and unquoted name of the database from which to extract data.
 .PARAMETER OutputDirectory
-    output_directory
+    The name (relative or absolute) of the directory into which to place the
+    extracted data and related files.  Must already exist.  E.g. `D:\BCP`.
+    Optional with default of the present working directory of the user who invokes
+    this script.
 .PARAMETER Password
-    password
+    Is a user-specified password. Passwords are case sensitive.
 .PARAMETER Query
-    query => *(schema_name, table_name, column_name)  Do *not* `SET NOCOUNT OFF`.
+    The (schema, table or view, column) triplets in the specified (server,
+    database) from which to extract the data. The query will be executed at the
+    specified server in the context of the specified database. The query must
+    return exactly three columns in order of "schema_name", "table_or_view_name",
+    and "column_name" where each entry be unqualified and unquoted. The columns
+    may be aliased however. The default value is a selection of all columns in
+    all user-defined tables.
 .PARAMETER Server
-    [protocol:]server[instance_name][,port]
+    The server from which to extract the data.  An unquoted string in the format
+    of "[protocol:]server[instance_name][,port]".
 .PARAMETER UserId
-    login_id
+    The login name or contained datbase user name.
 .PARAMETER UseTrustedConnection
-    (use trusted connection)
+    Whehter to use a trusted connection (i.e. Microsoft Windows Authentication
+    mode / "integrated login") instead of using an explicitly specified user name
+    and password to log on to SQL Server.
 #>
 
-# TODO: fill In script header documentation
-# TODO: input validation and early exceptions
 # QUESTION: do I need to account for SQL identifiers containing whitespace, any double quotes, etc.?
 
-[CmdletBinding(PositionalBinding=$false)]
-Param(
+[CmdletBinding()]
+param(
 
     # [protocol:]server[instance_name][,port]
     [Parameter(Mandatory=$true)]
@@ -32,29 +57,11 @@ Param(
     [string]
     $Server,
 
-    # (use trusted connection)
-    [Parameter(ParameterSetName="Trusted")]
-    [Alias("E", "trusted")]
-    [switch]
-    $UseTrustedConnection,
-
-    # login_id
-    [Parameter(ParameterSetName="Untrusted")]
-    [Alias("U", "uid", "UserName", "LoginId", "login", "lid")]
-    [string]
-    $UserId,
-
-    # password
-    [Parameter(ParameterSetName="Untrusted")]
-    [Alias("P", "pwd", "pass")]
-    [SecureString]
-    $Password,
-
     # db_name
-    [Parameter()]
+    [Parameter(Mandatory=$true)]
     [Alias("d")]
     [string]
-    $Database = $null,
+    $Database,
 
     # query => *(schema_name, table_name, column_name)
     [Parameter()]
@@ -69,7 +76,25 @@ Param(
         "       ON  col.object_id = tbl.object_id " +
         "WHERE sch.name <> 'sys' " +
         "ORDER BY sch.schema_id, tbl.object_id, col.column_id "  # MUST order by column_id witin {schema, table} for `bcp` format file to work properly
-    ),
+        ),
+
+    # (use trusted connection)
+    [Parameter(ParameterSetName="Trusted")]
+    [Alias("E", "trusted")]
+    [switch]
+    $UseTrustedConnection,
+
+    # login_id
+    [Parameter(Mandatory=$true, ParameterSetName="Untrusted")]
+    [Alias("U", "uid", "UserName", "LoginId", "login", "lid")]
+    [string]
+    $UserId,
+
+    # password
+    [Parameter(Mandatory=$true, ParameterSetName="Untrusted")]
+    [Alias("P", "pwd", "pass")]
+    [SecureString]
+    $Password,
 
     # output_directory
     [Parameter()]
@@ -82,6 +107,8 @@ Param(
 # CONFIGURE SCRIPT #
 ####################
 
+$ENDLINE = "`r`n";
+
 $FNAME = '_SchemasTablesColumns';  # output file name
 $EXT = 'csv';  # output file extension
 $CSV = $(Join-Path -Path "$OutputDirectory" -ChildPath "$FNAME.$EXT");
@@ -90,64 +117,40 @@ $CSV = $(Join-Path -Path "$OutputDirectory" -ChildPath "$FNAME.$EXT");
 # INITIALIZE SCRIPT #
 #####################
 
-# Ensure NOCOUNT And Natural Column Order
-$Query = @"
-SET NOCOUNT ON;
-
-CREATE TABLE #_SchemasTablesColumns ( sch sysname, obj sysname, col sysname );
-
-INSERT INTO #_SchemasTablesColumns ( sch, obj, col )
-$Query
-
-SELECT stc.sch, stc.obj, stc.col
-FROM #_SchemasTablesColumns AS stc
-    INNER JOIN sys.schemas AS sch
-        ON  stc.sch = sch.name
-    INNER JOIN sys.objects AS obj
-        ON  stc.obj = obj.name
-    INNER JOIN sys.columns AS col
-        ON  stc.col = col.name
-ORDER BY sch.schema_id, obj.object_id, col.column_id;
-"@;  # NOTE: natural column order is necessary for this script's bcp format file definition to work properly
+# Ensure NOCOUNT
+$Query = "SET NOCOUNT ON;$ENDLINE$Query";
 
 # Ensure Output Directory Resolves
 $OutputDirectory = Resolve-Path -Path "$OutputDirectory";
 
 # Ensure Transient File Won't Overwrite Anything
 $i = 2;
-While (Test-Path -Path "$CSV") {
+while (Test-Path -Path "$CSV") {
     $CSV = $(Join-Path -Path "$OutputDirectory" -ChildPath "$FNAME_$i.$EXT");
     $i += 1;
 }
 
-###################
-# VALIDATE INPUTS #
-###################
-
-# TODO: validate inputs (esp. whether the directory exists already, which it shouldn't)
+# Resolve Credentials
+if (-not $UseTrustedConnection -and -not $UserId -and -not $Password) {
+    $UseTrustedConnection = $true;
+}
 
 ################
 # DO THE THING #
 ################
 
-Try {
+try {
 
     ######################################
     # DETERMINE WHICH COLUMNS TO EXTRACT #
     ######################################
 
     $SEP = ',';  # field separator
-    If ($UseTrustedConnection -and $Database) {
-        sqlcmd -j -o "$CSV" -h -1 -s "$SEP" -W -C -u -E -S "$Server" -d "$Database" -Q "$Query";
+    if ($UseTrustedConnection) {
+        sqlcmd -j -o "$CSV" -h -1 -s "$SEP" -W -C -u -S "$Server" -d "$Database" -Q "$Query" -E;
     }
-    ElseIf ($UseTrustedConnection -and -not $Database) {
-        sqlcmd -j -o "$CSV" -h -1 -s "$SEP" -W -C -u -E -S "$Server" -Q "$Query";
-    }
-    ElseIf (-not $UseTrustedConnection -and $Database) {
-        sqlcmd -j -o "$CSV" -h -1 -s "$SEP" -W -C -u -U "$UserId" -P "$Password" -S "$Server" -d "$Database" -Q "$Query";
-    }
-    Else {
-        sqlcmd -j -o "$CSV" -h -1 -s "$SEP" -W -C -u -U "$UserId" -P "$Password" -S "$Server" -Q "$Query";
+    else {
+        sqlcmd -j -o "$CSV" -h -1 -s "$SEP" -W -C -u -S "$Server" -d "$Database" -Q "$Query" -U "$UserId" -P "$Password" ;
     }
 
     ####################
@@ -170,7 +173,7 @@ Try {
     # PROCESS EACH SCHEMA #
     #######################
 
-    ForEach ($Schema In @($SchemasTablesColumns | Group-Object -Property SchemaName) ) {
+    foreach ($Schema in @($SchemasTablesColumns | Group-Object -Property SchemaName) ) {
 
         # Create Schema Output Directory
         $SchemaDirectory = $(Join-Path -Path "$DatabaseDirectory" -ChildPath $Schema.Name);
@@ -180,7 +183,7 @@ Try {
         # PROCESS EACH TABLE #
         ######################
 
-        ForEach ($Table In @($Schema.Group | Group-Object -Property TableName) ) {
+        foreach ($Table in @($Schema.Group | Group-Object -Property TableName) ) {
 
             # Construct Table Output File Paths
             $FormatFile = $(Join-Path -Path "$SchemaDirectory" -ChildPath "$($Table.Name).xml");
@@ -196,26 +199,26 @@ Try {
             ######################
 
             # Create Raw Format File
-            If ($UseTrustedConnection) {
+            if ($UseTrustedConnection) {
                 bcp "$($Schema.Name).$($Table.Name)" format nul -N -x -f "$FormatFile" -S "$Server" -d "$Database" -T;
             }
-            Else {
+            else {
                 bcp "$($Schema.Name).$($Table.Name)" format nul -N -x -f "$FormatFile" -S "$Server" -d "$Database" -U "$UserId" -P "$Password";
             }
 
-            # Find The SOURCE / ID For Each COLUMN / FIELD Actually Included In The Extraction Query
+            # Find The SOURCE / ID For Each COLUMN / FIELD Actually Included in The Extraction Query
             [xml] $Format = $(Get-Content "$FormatFile");
             $IncludedSourceIDs = @($Format.BCPFORMAT.ROW.COLUMN |
                 Where-Object Name -In $ColumnNames |
                 Select-Object -ExpandProperty SOURCE
             );
 
-            # Remove Format COLUMNs Not Included In Extraction Query
+            # Remove Format COLUMNs Not Included in Extraction Query
             $Format.BCPFORMAT.ROW.COLUMN |
                 Where-Object SOURCE -NotIn $IncludedSourceIDs |
                 ForEach-Object { $_.ParentNode.RemoveChild($_) } >$nul;
 
-            # Remove Format FIELDs Not Included In Extraction Query
+            # Remove Format FIELDs Not Included in Extraction Query
             $Format.BCPFORMAT.RECORD.FIELD |
                 Where-Object ID -CNotIn $IncludedSourceIDs |
                 ForEach-Object { $_.ParentNode.RemoveChild($_) } >$nul;
@@ -228,10 +231,10 @@ Try {
 
             # QUESTION: do I need to specify an error file?
             # QUESTION: should I set a maximum number of errors before aborting?  if so, how many?
-            If ($UseTrustedConnection) {
+            if ($UseTrustedConnection) {
                 bcp "$SQL" queryout "$TableFile" -N -S "$Server" -d "$Database" -T;
             }
-            Else {
+            else {
                 bcp "$SQL" queryout "$TableFile" -N -S "$Server" -d "$Database" -U "$UserId" -P "$Password";
             }
 
@@ -243,7 +246,7 @@ Try {
 # CLEAN UP #
 ############
 
-Finally {
+finally {
     # TODO: remove CSV, database directory
     Remove-Item -Path "$CSV";
 }
