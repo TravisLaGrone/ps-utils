@@ -500,3 +500,5 @@ function Join-Object
         }
     }
 }
+
+New-Alias -Name 'join' -Value 'Join-Object';
