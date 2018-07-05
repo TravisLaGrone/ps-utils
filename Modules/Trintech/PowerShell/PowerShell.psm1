@@ -1,7 +1,5 @@
 # TODO document module
 
-. "$PSScriptRoot\Join-Object.ps1";
-
 # Import Immediate Child Modules
 $PSScriptRoot |
     Get-ChildItem -Directory |
