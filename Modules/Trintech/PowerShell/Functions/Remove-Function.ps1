@@ -20,6 +20,7 @@ function Remove-Function
 
         # The [System.Management.Automation.FunctionInfo] corresponding to the function to remove.
         [Parameter(Mandatory=$true,
+                   ValueFromPipeline=$true,
                    ParameterSetName='info')]
         [System.Management.Automation.FunctionInfo]
         $FunctionInfo
@@ -30,4 +31,12 @@ function Remove-Function
     }
 }
 
-New-Alias -Name 'rmfn' -Value 'Remove-Function';
+
+@('rmfn', 'rmfun', 'delfn', 'delfun') |
+    ForEach-Object {
+        try {
+            New-Alias -Name $_ -Value 'Remove-Function';
+        } catch {
+            Set-Alias -Name $_ -Value 'Remove-Function';
+        }
+    } > $nul ;
