@@ -5,7 +5,7 @@ A PowerShell 5 cookbook for XML.
 
 From file:
 ```powershell
-$Xml = [xml] $(Get-Content -Path 'file-location' );
+$XmlDocument = [xml] $(Get-Content -Path 'file-location' );
 ```
 
 ## CLI XML
@@ -21,4 +21,4 @@ $XDocument = [System.Xml.LINQ.XDocument]::Parse( $( $(Get-Content -Path 'file-lo
 Format:
 ```powershell
 $XDocument.ToString();
-``
+```
