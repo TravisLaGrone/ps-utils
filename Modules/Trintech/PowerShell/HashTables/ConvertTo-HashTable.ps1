@@ -1,17 +1,15 @@
 <#
 .SYNOPSIS
     Converts a pipeline to a hash table.
-.PARAMETER Object
-    Equivalent to `-KeyMemberName 'ToString' -IsValue`. Intended for use with
-    raw objects. Aliased as 'Default'.
-.PARAMETER Property
+.PARAMETER FromPSPropertyInfo
     Equivalent to `-KeyMemberName 'Name' -ValueMemberName 'Value'`. Intended for
     use with a PSPropertySet pipeline of PSPropertyInfo objects. Aliased as
-    'NameValue'.
-.PARAMETER Entry
+    'FromProperty'.
+.PARAMETER FromDictionaryEntry
     Equivalent to `-KeyMemberName 'Key' -ValueMemberName 'Value'`. Intended for
-    use with an IDictionaryEnumerator pipeline of DictionaryEntry objects.
-    Aliased as 'KeyValue'.
+    use with an IDictionaryEnumerator pipeline of DictionaryEntry objects, which
+    may be obtained from a HashTable by invoking its GetEnumerator method.
+    Aliased as 'FromEntry'.
 .PARAMETER IsKey
     Whether to use each object itself as the key.
 .PARAMETER KeyMemberName
@@ -30,43 +28,47 @@
 .PARAMETER ValueMemberName
     The name of the object member whose value to use as the value. May be either
     a property or a method. If a method, the method is invoked and the return
-    result is used as the value. Aliased as 'ValueName'.
+    result is used as the value. Aliased as 'ValName'.
 .PARAMETER ValueArgumentList
     The (optional) array of arguments to pass to the member value member method.
-    Only applicable if the value member is a method. Aliased as 'ValueArgs'.
+    Only applicable if the value member is a method. Aliased as 'ValArgs'.
 .PARAMETER ValueScript
     The delay-bind script block with which to extract the value from the piped
     object. See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_script_blocks?view=powershell-6#using-delay-bind-script-blocks-with-parameters
-    Aliased as 'GetValue'.
+    Aliased as 'GetVal'.
+.PARAMETER Ordered
+    Whether the returned hash table will have the Ordered attribute.
 .INPUTS
     Object
         The pipeline of objects from which to build a hash table.
 .OUTPUTS
-    HashTable
-        A hash table built from the pipeline of objects.
+    HashTable, System.Collections.Specialized.OrderedDictionary
+        An associative collection built by collecting the pipeline. The type is
+        HashTable unless the Ordered flag has been to $true, in which case the
+        type is OrderedDictionary.
+.NOTES
+    If no parameters are specified (other than the pipeline parameter), then the
+    keys are mapped to the string representation of their respective input objects,
+    and the values are the objects unchanged. Key stringification is performed
+    using `"$_"`, not `$_.ToString()`; as such, null values are mapped to empty
+    strings.
 #>
 function ConvertTo-HashTable
 {
-    [CmdletBinding(DefaultParameterSetName='ToStringKey, ObjectValue')]
+    [CmdletBinding(DefaultParameterSetName='Default')]
     param
     (
-        [Parameter(ParameterSetName='ToStringKey, ObjectValue', Mandatory=$true, Position=0)]
-        [Alias('Default', 'ToStringObject')]
+        [Parameter(ParameterSetName='FromPSPropertyInfo', Mandatory=$true, Position=0)]
+        [Alias('FromProperty')]
         [ValidateSet($true)]
         [Switch]
-        $Object = $true,
+        $FromPSPropertyInfo,
 
-        [Parameter(ParameterSetName='NameKey, ValueValue')]
-        [Alias('PSPropertyInfo', 'NameValue')]
+        [Parameter(ParameterSetName='FromDictionaryEntry', Mandatory=$true, Position=0)]
+        [Alias('FromEntry')]
         [ValidateSet($true)]
         [Switch]
-        $Property,
-
-        [Parameter(ParameterSetName='KeyKey, ValueValue')]
-        [Alias('DictionaryEntry', 'KeyValue')]
-        [ValidateSet($true)]
-        [Switch]
-        $Entry,
+        $FromDictionaryEntry,
 
         [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=1)]
         [Parameter(ParameterSetName='IsKey, ValueMember', Mandatory=$true, Position=1)]
@@ -107,7 +109,7 @@ function ConvertTo-HashTable
         [Parameter(ParameterSetName='IsKey, ValueMember',     Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyScript, ValueMember', Mandatory=$true, Position=2)]
-        [Alias('ValueName')]
+        [Alias('ValName')]
         [ValidateNotNullOrEmpty()]
         [String]
         $ValueMemberName,
@@ -115,7 +117,7 @@ function ConvertTo-HashTable
         [Parameter(ParameterSetName='IsKey, ValueMember',     Position=0)]
         [Parameter(ParameterSetName='KeyMember, ValueMember', Position=0)]
         [Parameter(ParameterSetName='KeyScript, ValueMember', Position=0)]
-        [Alias('ValueArgs')]
+        [Alias('ValArgs')]
         [ValidateNotNullOrEmpty()]
         [Object[]]
         $ValueArgumentList,
@@ -123,12 +125,27 @@ function ConvertTo-HashTable
         [Parameter(ParameterSetName='IsKey, ValueScript',     Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyMember, ValueScript', Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyScript, ValueScript', Mandatory=$true, Position=2)]
-        [Alias('GetValue')]
+        [Alias('GetVal')]
         [ValidateNotNull()]
         [ScriptBlock]
         $ValueScript,
 
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0)]
+        [Parameter(Position=0)]
+        [Switch]
+        $Ordered,
+
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='Default')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='FromPSPropertyInfo')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='FromDictionaryEntry')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, IsValue')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, ValueMember')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, ValueScript')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyMember, IsValue')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyMember, ValueMember')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyMember, ValueScript')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyScript, IsValue')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyScript, ValueMember')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyScript, ValueScript')]
         [AllowNull()]
         [AllowEmptyString()]
         [AllowEmptyCollection()]
@@ -136,15 +153,15 @@ function ConvertTo-HashTable
     )
     begin
     {
-        #region DefineHelperFunctions
+        #region Define-HelperFunctions
         filter Get-Key {
-            if ($Default) {
+            if ($PSCmdlet.ParameterSetName -eq 'Default') {
                 return "$_";
             }
-            elseif ($Property) {
+            elseif ($FromPSPropertyInfo) {
                 return $_.Name;
             }
-            elseif ($Entry) {
+            elseif ($FromDictionaryEntry) {
                 return $_.Key;
             }
             elseif ($IsKey) {
@@ -162,13 +179,13 @@ function ConvertTo-HashTable
         }
 
         filter Get-Value {
-            if ($Default) {
+            if ($PSCmdlet.ParameterSetName -eq 'Default') {
                 return $_;
             }
-            elseif ($Property) {
+            elseif ($FromPSPropertyInfo) {
                 return $_.Value;
             }
-            elseif ($Entry) {
+            elseif ($FromDictionaryEntry) {
                 return $_.Value;
             }
             elseif ($IsKey) {
@@ -184,9 +201,16 @@ function ConvertTo-HashTable
                 return $_ | ForEach-Object $ValueMemberName;
             }
         }
-        #endregion DefineHelperFunctions
+        #endregion Define-HelperFunctions
 
-        $HashTable = @{ };
+        #region Initialize-HashTable
+        if ($Ordered) {
+            $HashTable = [Ordered] @{ };
+        }
+        else {
+            $HashTable = @{ };
+        }
+        #endregion Initialize-HashTable
     }
     process
     {
