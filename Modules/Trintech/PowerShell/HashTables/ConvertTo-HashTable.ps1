@@ -3,89 +3,110 @@ function ConvertTo-HashTable
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-        [System.Collections.IEnumerable]
-        $Enumerable,
+        [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='IsKey, ValueMember', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='IsKey, ValueScript', Mandatory=$true, Position=1)]
+        [Switch]
+        $IsKey,
 
-        [Parameter(Mandatory=$true, ParameterSetName='KeyName, ValueName')]
-        [Parameter(Mandatory=$true, ParameterSetName='KeyName, ValueScript')]
+        [Parameter(ParameterSetName='KeyMember, IsValue',     Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='KeyMember, ValueScript', Mandatory=$true, Position=1)]
+        [Alias(KeyName)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $KeyMemberName,
 
-        [Parameter(ParameterSetName='KeyName, ValueName')]
-        [Parameter(ParameterSetName='KeyName, ValueScript')]
+        [Parameter(ParameterSetName='KeyMember, IsValue',     Position='named')]
+        [Parameter(ParameterSetName='KeyMember, ValueMember', Position='named')]
+        [Parameter(ParameterSetName='KeyMember, ValueScript', Position='named')]
+        [Alias(KeyArgs)]
+        [Validate]
         [Object[]]
         $KeyArgumentList,
 
-        # The script to extract the key from each item in a pipe of $Enumerable
-        [Parameter(Mandatory=$true, ParameterSetName='KeyScript, ValueName')]
-        [Parameter(Mandatory=$true, ParameterSetName='KeyScript, ValueScript')]
-        [System.Management.Automation.ScriptBlock]
+        [Parameter(ParameterSetName='KeyScript, IsValue',     Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='KeyScript, ValueMember', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='KeyScript, ValueScript', Mandatory=$true, Position=1)]
+        [Alias(GetKey)]
+        [ScriptBlock]
         $KeyScript,
 
-        [Parameter(Mandatory=$true, ParameterSetName='KeyName, ValueName')]
-        [Parameter(Mandatory=$true, ParameterSetName='KeyScript, ValueName')]
+        [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyMember, IsValue', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyScript, IsValue', Mandatory=$true, Position=2)]
+        [Switch]
+        $IsValue,
+
+        [Parameter(ParameterSetName='IsKey, ValueMember',     Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyScript, ValueMember', Mandatory=$true, Position=2)]
+        [Alias(ValueName)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $ValueMemberName,
 
-        [Parameter(ParameterSetName='ValueName, ValueName')]
-        [Parameter(ParameterSetName='ValueName, ValueScript')]
+        [Parameter(ParameterSetName='IsKey, ValueMember',     Position='named')]
+        [Parameter(ParameterSetName='KeyMember, ValueMember', Position='named')]
+        [Parameter(ParameterSetName='KeyScript, ValueMember', Position='named')]
+        [Alias(ValueArgs)]
         [Object[]]
         $ValueArgumentList,
 
-        # The script to extract the value from each item in a pipe of $Enumerable
-        [Parameter(Mandatory=$true, ParameterSetName='KeyName, ValueScript')]
-        [Parameter(Mandatory=$true, ParameterSetName='KeyScript, ValueScript')]
-        [System.Management.Automation.ScriptBlock]
-        $ValueScript
+        [Parameter(ParameterSetName='IsKey, ValueScript',     Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyMember, ValueScript', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyScript, ValueScript', Mandatory=$true, Position=2)]
+        [Alias(GetValue)]
+        [ScriptBlock]
+        $ValueScript,
+
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position='named')]
+        $InputObject
     )
     begin
     {
-        function Get-Key {
-            [CmdletBinding()]
-            param (
-                [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-                [PSObject]
-                $InputObject
-            )
-            process {
-                if ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
-                    return $_ | ForEach-Object $KeyScript;
-                }
-                elseif ($KeyArgumentList) {
-                    return $_ | ForEach-Object $KeyMemberName $KeyArgumentList;
-                }
-                else {
-                    return $_ | ForEach-Object $KeyMemberName;
-                }
+        #region DefineHelperFunctions
+        filter Get-Key {
+            if ($IsKey) {
+                return $_;
+            }
+            elseif ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
+                return $_ | ForEach-Object $KeyScript;
+            }
+            elseif ($KeyArgumentList) {
+                return $_ | ForEach-Object $KeyMemberName $KeyArgumentList;
+            }
+            else {
+                return $_ | ForEach-Object $KeyMemberName;
             }
         }
 
-        function Get-Value {
-            [CmdletBinding()]
-            param (
-                [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-                [PSObject]
-                $InputObject
-            )
-            process {
-                if ($PSCmdlet.ParameterSetName -like '*ValueScript*') {
-                    return $_ | ForEach-Object $ValueScript;
-                }
-                elseif ($ValueArgumentList) {
-                    return $_ | ForEach-Object $ValueMemberName $ValueArgumentList;
-                }
-                else {
-                    return $_ | ForEach-Object $ValueMemberName;
-                }
+        filter Get-Value {
+            if ($IsKey) {
+                return $_;
+            }
+            elseif ($PSCmdlet.ParameterSetName -like '*ValueScript*') {
+                return $_ | ForEach-Object $ValueScript;
+            }
+            elseif ($ValueArgumentList) {
+                return $_ | ForEach-Object $ValueMemberName $ValueArgumentList;
+            }
+            else {
+                return $_ | ForEach-Object $ValueMemberName;
             }
         }
+        #endregion DefineHelperFunctinos
+
+        $HashTable = @{ };
     }
     process
     {
-        return $Enumerable | ForEach-Object `
-            -begin { $HashTable = @{ }; } `
-            -process { $HashTable[$(Get-Key $_)] = $(Get-Value $_); } `
-            -end { return $HashTable; } ;
+        $Key = $_ | Get-Key;
+        $Value = $_ | Get-Value;
+        $HashTable[$Key] = $Value;
+    }
+    end
+    {
+        return $HashTable;
     }
 }
