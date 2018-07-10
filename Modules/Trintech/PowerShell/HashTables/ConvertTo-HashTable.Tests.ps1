@@ -3,20 +3,27 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 . "$here\$sut"
 
 Describe "ConvertTo-HashTable" {
-    Context "custom objects" {
-        $CustomObject = New-Object PSObject -Property @{ 'A'=1; 'B'=2; 'C'=3 } ;
+    enum KeyParameter { IsKey; KeyMemberName; KeyScript }
+    enum ValueParameter { IsValue; ValueMemberName; ValueScript }
 
-        It "converts to hash table from scripts" {
-            $Actual =
-            # TODO
-        }
+    $Objects = 1..10 |
+        ForEach-Object {
+            New-Object `
+                -TypeName 'PSCustomObject' `
+                -Property @{
+                    Number = $_
+                    Letter = [char]($_ + 64)
+                }
+        } |
+        Add-Member `
+            -MemberType 'ScriptMethod' `
+            -Name 'Get' `
+            -Value {
+                param([string]$PropertyName)
+                return $this | Select-Object -ExpandProperty $PropertyName
+            } `
+            -PassThru ;
 
-        It "converts to hash table from properties" {
-            # TODO
-        }
+    It ""
 
-        It "converts to hash table from methods" {
-            # TODO
-        }
-    }
 }
