@@ -57,59 +57,6 @@ Describe "ConvertTo-HashTable" {
         }
     }
 
-    Context "pipeline of PSPropertyInfo" {
-        BeforeAll {
-            $OneTwoThree = @{ 'one'=1; 'two'=2; 'three'=3 }
-        }
-
-        BeforeEach {
-            $Properties = $OneTwoThree.GetEnumerator() |
-                ForEach-Object {
-                    New-Object `
-                        -Type 'System.Management.Automation.PSNoteProperty' `
-                        -ArgumentList "$($_.Key)", $_.Value
-                }
-            $Expected = $OneTwoThree
-        }
-
-        It "is invoked with the FromPSPropertyInfo flag" {
-            $Actual = $Properties | ConvertTo-HashTable -FromPSPropertyInfo
-            $Comparison = Compare-HashTable $Actual $Expected
-            $Comparison | Should -BeTrue
-        }
-
-        It "is invoked with the FromProperty flag" {
-            $Actual = $Properties | ConvertTo-HashTable -FromProperty
-            $Comparison = Compare-HashTable $Actual $Expected
-            $Comparison | Should -BeTrue
-        }
-    }
-
-    Context "pipeline of DictionaryEntry" {
-        BeforeEach {
-            $OneTwoThree = @{ 'one'=1; 'two'=2; 'three'=3 }
-            $Entries = $OneTwoThree.GetEnumerator() |
-                ForEach-Object {
-                    New-Object `
-                        -TypeName 'System.Collections.DictionaryEntry' `
-                        -ArgumentList $_.Key, $_.Value
-                }
-            $Expected = $OneTwoThree
-        }
-
-        It "is invoked with the FromDictionaryEntry flag" {
-            $Actual = $Entries | ConvertTo-HashTable -FromDictionaryEntry
-            $Comparison = Compare-HashTable $Actual $Expected
-            $Comparison | Should -BeTrue
-        }
-
-        It "is invoked with the FromEntry flag" {
-            $Actual = $Entries | ConvertTo-HashTable -FromEntry
-            $Comparison = Compare-HashTable $Actual $Expected
-            $Comparison | Should -BeTrue
-        }
-    }
-
     Context "pipeline of custom Object" {
         BeforeAll {
             $KEY_ID = 'Letter'
