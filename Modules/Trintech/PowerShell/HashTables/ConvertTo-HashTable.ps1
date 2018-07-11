@@ -1,37 +1,28 @@
 <#
 .SYNOPSIS
     Converts a pipeline to a hash table.
-.PARAMETER FromPSPropertyInfo
-    Equivalent to `-KeyMemberName 'Name' -ValueMemberName 'Value'`. Intended for
-    use with a PSPropertySet pipeline of PSPropertyInfo objects. Aliased as
-    'FromProperty'.
-.PARAMETER FromDictionaryEntry
-    Equivalent to `-KeyMemberName 'Key' -ValueMemberName 'Value'`. Intended for
-    use with an IDictionaryEnumerator pipeline of DictionaryEntry objects, which
-    may be obtained from a HashTable by invoking its GetEnumerator method.
-    Aliased as 'FromEntry'.
 .PARAMETER InputObjectIsKey
-    Whether to use each object itself as the key. Aliased as 'IsKey'.
+    Equivalent to `-KeyScript { $_ }`. Aliased as 'IsKey'.
 .PARAMETER KeyMemberName
-    The name of the object member whose value to use as the key. May be either
-    a property or a method. If a method, the method is invoked and the return
-    result is used as the key. Aliased as 'KeyName'.
+    Equivalent to `-KeyScript { $_ | ForEach-Object $KeyMemberName }`.
+    Aliased as 'KeyName'.
 .PARAMETER KeyArgumentList
     The (optional) array of arguments to pass to the member key member method.
-    Only applicable if the key member is a method. Aliased as 'KeyArgs'.
+    Only applicable if the key member is a method. Equivalent to
+    `-KeyScript $KeyMemberName $KeyArgumentList`. Aliased as 'KeyArgs'.
 .PARAMETER KeyScript
     The delay-bind script block with which to extract the key from the piped
     object. See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_script_blocks?view=powershell-6#using-delay-bind-script-blocks-with-parameters
     Aliased as 'GetKey'.
 .PARAMETER InputObjectIsValue
-    Whether to use each value itself as the key. Aliased as 'IsValue'.
+    Equivalent to `-ValueScript { $_ }`. Aliased as 'IsValue'.
 .PARAMETER ValueMemberName
-    The name of the object member whose value to use as the value. May be either
-    a property or a method. If a method, the method is invoked and the return
-    result is used as the value. Aliased as 'ValName'.
+    Equivalent to `-ValueScript { $_ | ForEach-Object $ValueMemberName }`.
+    Aliased as 'ValName'.
 .PARAMETER ValueArgumentList
     The (optional) array of arguments to pass to the member value member method.
-    Only applicable if the value member is a method. Aliased as 'ValArgs'.
+    Only applicable if the value member is a method. Equivalent to
+    `-ValueScript $ValueMemberName $ValueArgumentList`. Aliased as 'ValArgs'.
 .PARAMETER ValueScript
     The delay-bind script block with which to extract the value from the piped
     object. See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_script_blocks?view=powershell-6#using-delay-bind-script-blocks-with-parameters
@@ -46,30 +37,12 @@
         An associative collection built by collecting the pipeline. The type is
         HashTable unless the Ordered flag has been to $true, in which case the
         type is OrderedDictionary.
-.NOTES
-    If no parameters are specified (other than the pipeline parameter), then the
-    keys are mapped to the string representation of their respective input objects,
-    and the values are the objects unchanged. Key stringification is performed
-    using `"$_"`, not `$_.ToString()`; as such, null values are mapped to empty
-    strings.
 #>
 function ConvertTo-HashTable
 {
-    [CmdletBinding(DefaultParameterSetName='Default')]
+    [CmdletBinding()]
     param
     (
-        [Parameter(ParameterSetName='FromPSPropertyInfo', Mandatory=$true, Position=0)]
-        [Alias('FromProperty')]
-        [ValidateSet($true)]
-        [Switch]
-        $FromPSPropertyInfo,
-
-        [Parameter(ParameterSetName='FromDictionaryEntry', Mandatory=$true, Position=0)]
-        [Alias('FromEntry')]
-        [ValidateSet($true)]
-        [Switch]
-        $FromDictionaryEntry,
-
         [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=1)]
         [Parameter(ParameterSetName='IsKey, ValueMember', Mandatory=$true, Position=1)]
         [Parameter(ParameterSetName='IsKey, ValueScript', Mandatory=$true, Position=1)]
@@ -138,9 +111,6 @@ function ConvertTo-HashTable
         [Switch]
         $Ordered,
 
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='Default')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='FromPSPropertyInfo')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='FromDictionaryEntry')]
         [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, IsValue')]
         [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, ValueMember')]
         [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, ValueScript')]
@@ -159,16 +129,7 @@ function ConvertTo-HashTable
     {
         #region Define-HelperFunctions
         filter Get-Key {
-            if ($PSCmdlet.ParameterSetName -eq 'Default') {
-                return "$_";
-            }
-            elseif ($FromPSPropertyInfo) {
-                return $_.Name;
-            }
-            elseif ($FromDictionaryEntry) {
-                return $_.Key;
-            }
-            elseif ($InputObjectIsKey) {
+            if ($InputObjectIsKey) {
                 return $_;
             }
             elseif ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
@@ -183,16 +144,7 @@ function ConvertTo-HashTable
         }
 
         filter Get-Value {
-            if ($PSCmdlet.ParameterSetName -eq 'Default') {
-                return $_;
-            }
-            elseif ($FromPSPropertyInfo) {
-                return $_.Value;
-            }
-            elseif ($FromDictionaryEntry) {
-                return $_.Value;
-            }
-            elseif ($InputObjectIsValue) {
+            if ($InputObjectIsValue) {
                 return $_;
             }
             elseif ($PSCmdlet.ParameterSetName -like '*ValueScript*') {

@@ -4,18 +4,11 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 
 Describe "ConvertTo-HashTable" {
     BeforeAll {
-        enum SwitchParameter { FromPSPropertyInfo; FromDictionaryEntry }
         enum KeyParameter { InputObjectIsKey; KeyMemberName; KeyArgumentList; KeyScript }
         enum ValueParameter { InputObjectIsValue; ValueMemberName; ValueArgumentList; ValueScript }
 
         #region Create-ParameterSets
         $PARAMETER_SETS = New-Object -TypeName 'System.Collections.ArrayList'
-
-        foreach ($SwitchParam in [SwitchParameter].GetEnumNames() ) {
-            $ParamSet = @($SwitchParam)
-            $PARAMETER_SETS.Add($ParamSet)
-        }
-
         foreach ($KeyParam in [KeyParameter].GetEnumNames() ) {
             if ($KeyParam -eq 'KeyArgumentList') {
                 $KeyParams = @('KeyMemberName', $KeyParam)
