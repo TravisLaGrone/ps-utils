@@ -10,8 +10,8 @@
     use with an IDictionaryEnumerator pipeline of DictionaryEntry objects, which
     may be obtained from a HashTable by invoking its GetEnumerator method.
     Aliased as 'FromEntry'.
-.PARAMETER IsKey
-    Whether to use each object itself as the key.
+.PARAMETER InputObjectIsKey
+    Whether to use each object itself as the key. Aliased as 'IsKey'.
 .PARAMETER KeyMemberName
     The name of the object member whose value to use as the key. May be either
     a property or a method. If a method, the method is invoked and the return
@@ -23,8 +23,8 @@
     The delay-bind script block with which to extract the key from the piped
     object. See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_script_blocks?view=powershell-6#using-delay-bind-script-blocks-with-parameters
     Aliased as 'GetKey'.
-.PARAMETER IsValue
-    Whether to use each value itself as the key.
+.PARAMETER InputObjectIsValue
+    Whether to use each value itself as the key. Aliased as 'IsValue'.
 .PARAMETER ValueMemberName
     The name of the object member whose value to use as the value. May be either
     a property or a method. If a method, the method is invoked and the return
@@ -73,8 +73,10 @@ function ConvertTo-HashTable
         [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=1)]
         [Parameter(ParameterSetName='IsKey, ValueMember', Mandatory=$true, Position=1)]
         [Parameter(ParameterSetName='IsKey, ValueScript', Mandatory=$true, Position=1)]
+        [Alias('IsKey')]
+        [ValidateSet($true)]
         [Switch]
-        $IsKey,
+        $InputObjectIsKey,
 
         [Parameter(ParameterSetName='KeyMember, IsValue',     Mandatory=$true, Position=1)]
         [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=1)]
@@ -103,8 +105,10 @@ function ConvertTo-HashTable
         [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyMember, IsValue', Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyScript, IsValue', Mandatory=$true, Position=2)]
+        [Alias('IsValue')]
+        [ValidateSet($true)]
         [Switch]
-        $IsValue,
+        $InputObjectIsValue,
 
         [Parameter(ParameterSetName='IsKey, ValueMember',     Mandatory=$true, Position=2)]
         [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=2)]
@@ -164,7 +168,7 @@ function ConvertTo-HashTable
             elseif ($FromDictionaryEntry) {
                 return $_.Key;
             }
-            elseif ($IsKey) {
+            elseif ($InputObjectIsKey) {
                 return $_;
             }
             elseif ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
@@ -188,7 +192,7 @@ function ConvertTo-HashTable
             elseif ($FromDictionaryEntry) {
                 return $_.Value;
             }
-            elseif ($IsKey) {
+            elseif ($InputObjectIsValue) {
                 return $_;
             }
             elseif ($PSCmdlet.ParameterSetName -like '*ValueScript*') {
@@ -205,17 +209,17 @@ function ConvertTo-HashTable
 
         #region Initialize-HashTable
         if ($Ordered) {
-            $HashTable = [Ordered] @{ };
+            [HashTable] $HashTable = [Ordered] @{ };
         }
         else {
-            $HashTable = @{ };
+            [HashTable] $HashTable = @{ };
         }
         #endregion Initialize-HashTable
     }
     process
     {
-        $Key = $_ | Get-Key;
-        $Value = $_ | Get-Value;
+        $Key = $InputObject | Get-Key;
+        $Value = $InputObject | Get-Value;
         $HashTable[$Key] = $Value;
     }
     end
