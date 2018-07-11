@@ -1,8 +1,6 @@
 <#
 .SYNOPSIS
     Converts a pipeline to a hash table.
-.PARAMETER InputObjectIsKey
-    Equivalent to `-KeyScript { $_ }`. Aliased as 'IsKey'.
 .PARAMETER KeyMemberName
     Equivalent to `-KeyScript { $_ | ForEach-Object $KeyMemberName }`.
     Aliased as 'KeyName'.
@@ -14,8 +12,6 @@
     The delay-bind script block with which to extract the key from the piped
     object. See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_script_blocks?view=powershell-6#using-delay-bind-script-blocks-with-parameters
     Aliased as 'GetKey'.
-.PARAMETER InputObjectIsValue
-    Equivalent to `-ValueScript { $_ }`. Aliased as 'IsValue'.
 .PARAMETER ValueMemberName
     Equivalent to `-ValueScript { $_ | ForEach-Object $ValueMemberName }`.
     Aliased as 'ValName'.
@@ -28,7 +24,8 @@
     object. See https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_script_blocks?view=powershell-6#using-delay-bind-script-blocks-with-parameters
     Aliased as 'GetVal'.
 .PARAMETER Ordered
-    Whether the returned hash table will have the Ordered attribute.
+    Whether the returned hash table will have the Ordered attribute. If so, then
+    the underlying type is actuall [System.Collections.Specialized.OrderedDictionary].
 .INPUTS
     Object
         The pipeline of objects from which to build a hash table.
@@ -43,65 +40,43 @@ function ConvertTo-HashTable
     [CmdletBinding()]
     param
     (
-        [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=1)]
-        [Parameter(ParameterSetName='IsKey, ValueMember', Mandatory=$true, Position=1)]
-        [Parameter(ParameterSetName='IsKey, ValueScript', Mandatory=$true, Position=1)]
-        [Alias('IsKey')]
-        [ValidateSet($true)]
-        [Switch]
-        $InputObjectIsKey,
-
-        [Parameter(ParameterSetName='KeyMember, IsValue',     Mandatory=$true, Position=1)]
-        [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=1)]
-        [Parameter(ParameterSetName='KeyMember, ValueScript', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='KeyName, ValName', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='KeyName, GetVal', Mandatory=$true, Position=1)]
         [Alias('KeyName')]
         [ValidateNotNullOrEmpty()]
         [String]
         $KeyMemberName,
 
-        [Parameter(ParameterSetName='KeyMember, IsValue',     Position=0)]
-        [Parameter(ParameterSetName='KeyMember, ValueMember', Position=0)]
-        [Parameter(ParameterSetName='KeyMember, ValueScript', Position=0)]
+        [Parameter(ParameterSetName='KeyName, ValName', Position=0)]
+        [Parameter(ParameterSetName='KeyName, GetVal', Position=0)]
         [Alias('KeyArgs')]
         [ValidateNotNullOrEmpty()]
         [Object[]]
         $KeyArgumentList,
 
-        [Parameter(ParameterSetName='KeyScript, IsValue',     Mandatory=$true, Position=1)]
-        [Parameter(ParameterSetName='KeyScript, ValueMember', Mandatory=$true, Position=1)]
-        [Parameter(ParameterSetName='KeyScript, ValueScript', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='GetKey, ValName', Mandatory=$true, Position=1)]
+        [Parameter(ParameterSetName='GetKey, GetVal', Mandatory=$true, Position=1)]
         [Alias('GetKey')]
         [ValidateNotNull()]
         [ScriptBlock]
         $KeyScript,
 
-        [Parameter(ParameterSetName='IsKey, IsValue',     Mandatory=$true, Position=2)]
-        [Parameter(ParameterSetName='KeyMember, IsValue', Mandatory=$true, Position=2)]
-        [Parameter(ParameterSetName='KeyScript, IsValue', Mandatory=$true, Position=2)]
-        [Alias('IsValue')]
-        [ValidateSet($true)]
-        [Switch]
-        $InputObjectIsValue,
-
-        [Parameter(ParameterSetName='IsKey, ValueMember',     Mandatory=$true, Position=2)]
-        [Parameter(ParameterSetName='KeyMember, ValueMember', Mandatory=$true, Position=2)]
-        [Parameter(ParameterSetName='KeyScript, ValueMember', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyName, ValName', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='GetKey, ValName', Mandatory=$true, Position=2)]
         [Alias('ValName')]
         [ValidateNotNullOrEmpty()]
         [String]
         $ValueMemberName,
 
-        [Parameter(ParameterSetName='IsKey, ValueMember',     Position=0)]
-        [Parameter(ParameterSetName='KeyMember, ValueMember', Position=0)]
-        [Parameter(ParameterSetName='KeyScript, ValueMember', Position=0)]
+        [Parameter(ParameterSetName='KeyName, ValName', Position=0)]
+        [Parameter(ParameterSetName='GetKey, ValName', Position=0)]
         [Alias('ValArgs')]
         [ValidateNotNullOrEmpty()]
         [Object[]]
         $ValueArgumentList,
 
-        [Parameter(ParameterSetName='IsKey, ValueScript',     Mandatory=$true, Position=2)]
-        [Parameter(ParameterSetName='KeyMember, ValueScript', Mandatory=$true, Position=2)]
-        [Parameter(ParameterSetName='KeyScript, ValueScript', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='KeyName, GetVal', Mandatory=$true, Position=2)]
+        [Parameter(ParameterSetName='GetKey, GetVal', Mandatory=$true, Position=2)]
         [Alias('GetVal')]
         [ValidateNotNull()]
         [ScriptBlock]
@@ -111,15 +86,10 @@ function ConvertTo-HashTable
         [Switch]
         $Ordered,
 
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, IsValue')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, ValueMember')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='IsKey, ValueScript')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyMember, IsValue')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyMember, ValueMember')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyMember, ValueScript')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyScript, IsValue')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyScript, ValueMember')]
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyScript, ValueScript')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyName, ValName')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='KeyName, GetVal')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='GetKey, ValName')]
+        [Parameter(ValueFromPipeline=$true, Mandatory=$true, Position=0, ParameterSetName='GetKey, GetVal')]
         [AllowNull()]
         [AllowEmptyString()]
         [AllowEmptyCollection()]
@@ -128,14 +98,11 @@ function ConvertTo-HashTable
     begin
     {
         #region Define Get-Key
-        if ($InputObjectIsKey) {
-            filter Get-Key { $_ }
-        }
-        elseif ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
+        if ($KeyScript) {
             filter Get-Key { $_ | ForEach-Object $KeyScript }
         }
         elseif ($KeyArgumentList) {
-            filter Get-Key { $_ | ForEach-Object $KeyMemberName $KeyArgumentList }
+            filter Get-Key { $_ | ForEach-Object $KeyMemberName -ArgumentList $KeyArgumentList }
         }
         else {
             filter Get-Key { $_ | ForEach-Object $KeyMemberName }
@@ -143,14 +110,11 @@ function ConvertTo-HashTable
         #endregion Define Get-Key
 
         #region Define Get-Value
-        if ($InputObjectIsValue) {
-            filter Get-Value { $_ }
-        }
-        elseif ($PSCmdlet.ParameterSetName -like '*ValueScript*') {
+        if ($ValueScript) {
             filter Get-Value { $_ | ForEach-Object $ValueScript }
         }
         elseif ($ValueArgumentList) {
-            filter Get-Value { $_ | ForEach-Object $ValueMemberName $ValueArgumentList }
+            filter Get-Value { $_ | ForEach-Object $ValueMemberName -ArgumentList $ValueArgumentList }
         }
         else {
             filter Get-Value { $_ | ForEach-Object $ValueMemberName }

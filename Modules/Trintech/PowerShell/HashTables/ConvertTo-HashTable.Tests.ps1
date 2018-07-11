@@ -4,8 +4,8 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 
 Describe "ConvertTo-HashTable" {
     BeforeAll {
-        enum KeyParameter { InputObjectIsKey; KeyMemberName; KeyArgumentList; KeyScript }
-        enum ValueParameter { InputObjectIsValue; ValueMemberName; ValueArgumentList; ValueScript }
+        enum KeyParameter { KeyMemberName; KeyArgumentList; KeyScript }
+        enum ValueParameter { ValueMemberName; ValueArgumentList; ValueScript }
 
         #region Create-ParameterSets
         $PARAMETER_SETS = New-Object -TypeName 'System.Collections.ArrayList'
@@ -24,7 +24,7 @@ Describe "ConvertTo-HashTable" {
                 }
 
                 $ParamSet = $KeyParams + $ValueParams
-                $PARAMETER_SETS.Add($ParamSet)
+                $PARAMETER_SETS.Add($ParamSet) | Out-Null
             }
         }
         #endregion Create-ParameterSets
@@ -44,19 +44,6 @@ Describe "ConvertTo-HashTable" {
         }
     }
 
-    Context "pipeline of arbitrary Object" {
-        BeforeEach {
-            $Objects = 1..3
-            $Expected = @{ '1'=1; '2'=2; '3'=3 }
-        }
-
-        It "is invoked with no options" {
-            $Actual = $Objects | ConvertTo-HashTable
-            $Comparison = Compare-HashTable $Actual $Expected
-            $Comparison | Should -BeTrue
-        }
-    }
-
     Context "pipeline of custom Object" {
         BeforeAll {
             $KEY_ID = 'Letter'
@@ -65,7 +52,7 @@ Describe "ConvertTo-HashTable" {
 
             $TEST_CASES = New-Object -TypeName 'System.Collections.ArrayList'
             foreach ($ParameterSet in $PARAMETER_SETS) {
-                $TestCase = $ParameterSet |
+                $ParameterSet |
                     ForEach-Object { $_ } -PipelineVariable Name |
                     ForEach-Object `
                         -begin {
@@ -74,11 +61,11 @@ Describe "ConvertTo-HashTable" {
                                 FromDictionaryEntry = $true
                                 InputObjectIsKey = $true
                                 KeyMemberName = $KEY_ID
-                                KeyArgumentList = @($KEY_ID)
+                                KeyArgumentList = $KEY_ID
                                 KeyScript = { $_ | ForEach-Object $KEY_ID }
                                 InputObjectIsValue = $true
                                 ValueMemberName = $VALUE_ID
-                                ValueArgumentList = @($VALUE_ID)
+                                ValueArgumentList = $VALUE_ID
                                 ValueScript = { $_ | ForEach-Object $VALUE_ID }
                             }
                         } `
@@ -96,20 +83,17 @@ Describe "ConvertTo-HashTable" {
                             }
                             return $Arguments
                         } |
-                    Add-Member `
-                        -MemberType ScriptMethod `
-                        -Name 'ToString' `
-                        -Value {
-                            $this.GetEnumerator() |
-                                ForEach-Object `
-                                    -process { "$($_.Key)=$($_.Value)" } `
-                                    -end { $Input -join '; ' }
-                        } `
-                        -Force `
-                        -PassThru |
-                    ForEach-Object { @{ Arguments = $_ } }
-
-                $TEST_CASES.Add($TestCase)
+                    ForEach-Object {
+                        [String] $ToString = @( $_.GetEnumerator() |
+                                ForEach-Object { "$($_.Key)=$($_.Value)" }
+                            ) -join '; '
+                        $TestCase = @{
+                            Arguments = $_
+                            ToString = $ToString
+                        }
+                        return $TestCase
+                    } |
+                    ForEach-Object { $TEST_CASES.Add($TestCase) | Out-Null }
             }
 
             $ABC = @{ 'A'=1; 'B'=2; 'C'=3 }
@@ -137,8 +121,8 @@ Describe "ConvertTo-HashTable" {
             $Expected = $ABC
         }
 
-        It "is invoked with <Arguments>" -TestCases $TEST_CASES {
-            param($Arguments)
+        It "is invoked with <ToString>" -TestCases $TEST_CASES {
+            param($Arguments, $ToString)
 
             $Actual = $Objects | ConvertTo-HashTable @Arguments
             $Comparison = Compare-HashTable $Actual $Expected
