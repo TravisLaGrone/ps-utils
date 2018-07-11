@@ -127,46 +127,44 @@ function ConvertTo-HashTable
     )
     begin
     {
-        #region Define-HelperFunctions
-        filter Get-Key {
-            if ($InputObjectIsKey) {
-                return $_;
-            }
-            elseif ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
-                return $_ | ForEach-Object $KeyScript;
-            }
-            elseif ($KeyArgumentList) {
-                return $_ | ForEach-Object $KeyMemberName $KeyArgumentList;
-            }
-            else {
-                return $_ | ForEach-Object $KeyMemberName;
-            }
+        #region Define Get-Key
+        if ($InputObjectIsKey) {
+            filter Get-Key { $_ }
         }
-
-        filter Get-Value {
-            if ($InputObjectIsValue) {
-                return $_;
-            }
-            elseif ($PSCmdlet.ParameterSetName -like '*ValueScript*') {
-                return $_ | ForEach-Object $ValueScript;
-            }
-            elseif ($ValueArgumentList) {
-                return $_ | ForEach-Object $ValueMemberName $ValueArgumentList;
-            }
-            else {
-                return $_ | ForEach-Object $ValueMemberName;
-            }
+        elseif ($PSCmdlet.ParameterSetName -like '*KeyScript*') {
+            filter Get-Key { $_ | ForEach-Object $KeyScript }
         }
-        #endregion Define-HelperFunctions
+        elseif ($KeyArgumentList) {
+            filter Get-Key { $_ | ForEach-Object $KeyMemberName $KeyArgumentList }
+        }
+        else {
+            filter Get-Key { $_ | ForEach-Object $KeyMemberName }
+        }
+        #endregion Define Get-Key
 
-        #region Initialize-HashTable
+        #region Define Get-Value
+        if ($InputObjectIsValue) {
+            filter Get-Value { $_ }
+        }
+        elseif ($PSCmdlet.ParameterSetName -like '*ValueScript*') {
+            filter Get-Value { $_ | ForEach-Object $ValueScript }
+        }
+        elseif ($ValueArgumentList) {
+            filter Get-Value { $_ | ForEach-Object $ValueMemberName $ValueArgumentList }
+        }
+        else {
+            filter Get-Value { $_ | ForEach-Object $ValueMemberName }
+        }
+        #endregion Define Get-Value
+
+        #region Initialize HashTable
         if ($Ordered) {
             [HashTable] $HashTable = [Ordered] @{ };
         }
         else {
             [HashTable] $HashTable = @{ };
         }
-        #endregion Initialize-HashTable
+        #endregion Initialize HashTable
     }
     process
     {
