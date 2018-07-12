@@ -37,7 +37,7 @@
 #>
 function ConvertTo-HashTable
 {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding=$false)]
     param
     (
         [Parameter(ParameterSetName='KeyName, ValName', Mandatory=$true, Position=1)]
