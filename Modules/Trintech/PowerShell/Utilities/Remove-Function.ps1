@@ -31,7 +31,6 @@ function Remove-Function
     }
 }
 
-
 @('rmfn', 'rmfun', 'delfn', 'delfun') |
     ForEach-Object {
         try {
