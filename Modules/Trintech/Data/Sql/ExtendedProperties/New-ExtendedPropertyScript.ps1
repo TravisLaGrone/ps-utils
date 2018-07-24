@@ -144,7 +144,6 @@ param (
 
     [Parameter()]
     [Switch]
-<<<<<<< HEAD
     $SqlCmd,
 
     [Parameter()]
@@ -171,21 +170,6 @@ begin {
     $MAX_LENGTH = 128
 
     $LEVELS = 0..2
-=======
-    $SkipNullValuess
-)
-begin {
-    #region Imports
-    Import-Module ImportExcel
-    #endregion Imports
-
-
-    #region Constants
-    $ENDL = "`r`n"
-
-    $MAX_LENGTH = 128
-
-    $LEVELS = 0..2
 
     $EXTENDED_PROPERTY_LEVEL_MEMBER_NAMES = @(
         'level0type'
@@ -196,28 +180,6 @@ begin {
         'level2name'
     )
 
-    $EXTENDED_PROPERTY_MEMBER_NAMES = @('name', 'value') + $EXTENDED_PROPERTY_LEVEL_MEMBER_NAMES
-
-    $FORMAT_ARGUMENT_LIST = @{
-        LeftQuote = ''''
-        RightQuote = ''''
-        EscapeSequence = ''''
-        ValueIfNull = 'NULL'
-        PassThruIfNotString = $true
-    }
-    #endregion Constants
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
-
-    $EXTENDED_PROPERTY_LEVEL_MEMBER_NAMES = @(
-        'level0type'
-        'level0name'
-        'level1type'
-        'level1name'
-        'level2type'
-        'level2name'
-    )
-
-<<<<<<< HEAD
     $EXTENDED_PROPERTY_MEMBER_NAMES = @('name', 'value') + $EXTENDED_PROPERTY_LEVEL_MEMBER_NAMES
 
     $FORMAT_ARGUMENT_LIST = @{
@@ -264,68 +226,10 @@ begin {
                 return $Difference
             }
             default { throw "Error, unrecognized set operation `"$Operation`"" }
-=======
-    #region Helper Functions
-    function New-Array { $Input }
-
-    filter ConvertTo-Pipeline {
-        foreach ($Element in $_) {
-            $Element
-        }
-    }
-
-    function Select-Unique {
-        return $Input | Select-Object -Unique
-    }
-
-    enum SetOperation { Union; Intersection; Difference; CrossProduct }
-
-    function Join-Set([SetOperation]$Operation) {
-        <# Returns a copy. #>
-        $HasInput = $Input.MoveNext()
-        if (-not $HasInput) {
-            return $null
-        }
-        if (-not $Operation) {
-            return $Input | ConvertTo-Pipeline | Select-Object -Unique
-        }
-        switch ($Operation) {
-            Difference {
-                $Difference = $Input.Current.GetEnumerator() | Select-Unique
-                while ($Input.MoveNext()) {
-                    $Other = $Input.Current | Select-Unique
-                    $Difference = $Difference | Where-Object { $_ -notin $Other }
-                }
-                return $Difference
-            }
-            default { throw "Error, unrecognized set operation `"$Operation`"" }
-        }
-    }
-
-    filter ConvertTo-HashTable($MemberTypes) {
-        $HashTable = @{ }
-        foreach ($Property in $_.PSObject.Properties) {
-            if (-not $MemberTypes -or $MemberTypes -contains $Property.MemberType) {
-                $HashTable.Add($Property.Name, $Property.Value)
-            }
-        }
-        return $HashTable
-    }
-
-    function Merge-HashTable {
-        <# Returns a copy. If multiple hash tables contain a key, the last hash table's entry takes precedence. #>
-        $Merged = @{ }
-        foreach ($HashTable in $Input) {
-            foreach ($Entry in $HashTable.GetEnumerator()) {
-                $Merged.Remove($Entry.Key)
-                $Merged.Add($Entry.Key, $Entry.Value)
-            }
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
         }
         return $Merged
     }
 
-<<<<<<< HEAD
     filter ConvertTo-HashTable($MemberTypes) {
         $HashTable = @{ }
         foreach ($Property in $_.PSObject.Properties) {
@@ -365,25 +269,6 @@ begin {
         return $_
     }
 
-=======
-    filter Set-HashTable($Defaults, $Overrides) {
-        <# Returns a copy. #>
-        $Defaults, $_, $Overrides | Merge-HashTable
-    }
-
-    filter Select-HashTable($IncludeKeys, $ExcludeKeys) {
-        $_ = $_.Clone()
-        foreach ($Key in @($_.Keys)) {
-            if (($IncludeKeys -and ($Key -notin $IncludeKeys)) -or
-                ($ExcludeKeys -and ($Key -in $ExcludeKeys))
-            ) {
-                $_.Remove($Key)
-            }
-        }
-        return $_
-    }
-
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
     filter Edit-HashTable([Switch]$Melt, $Identifiers, $VariableName, $ValueName) {
         if ($Melt) {
             $Keys = @($_.Keys)
@@ -560,7 +445,6 @@ begin {
             if (-not ($_['name'] | Test-SqlValue -TypeName 'SysName')) {
                 return $false
             }
-<<<<<<< HEAD
         }
 
         # Validate nullity for each level
@@ -579,26 +463,6 @@ begin {
             }
         }
 
-=======
-        }
-
-        # Validate nullity for each level
-        if ($Routine -eq 'List') {
-            foreach ($Level in $LEVELS) {
-                if (-not ($null -ne $_["level$($Level)type"] -or $null -eq $_["level$($Level)name"])) {
-                    return $false
-                }
-            }
-        }
-        else {
-            foreach ($Level in $LEVELS) {
-                if (-not (($null -eq $_["level$($Level)type"]) -eq ($null -eq $_["level$($Level)name"]))) {
-                    return $false
-                }
-            }
-        }
-
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
         # Validate nullity for hierarchy of types
         $LeastNullTypeAlreadyEncountered = $false
         foreach ($Level in $LEVELS) {
@@ -636,7 +500,6 @@ begin {
             throw "Error, extended property is not valid for routine `"$Routine`": $_"
         }
 
-<<<<<<< HEAD
         $ExtendedProperty = $_
 
         $Formatted = switch ($Routine) {
@@ -644,37 +507,15 @@ begin {
                 $List = $ExtendedProperty | Format-ExtendedProperty -Routine 'List' -Execute -ValidateInput:$ValidateInput
                 $Add  = $ExtendedProperty | Format-ExtendedPropeerty -Routine 'Add' -Execute -ValidateInput:$ValidateInput
                 $Formatted = "IF (NOT EXISTS($List)) BEGIN $Ad eEND"
-=======
-        $name       = $_['name']       | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $value      = $_['value']      | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level0type = $_['level0type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level0name = $_['level0name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level1type = $_['level1type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level1name = $_['level1name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level2type = $_['level2type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level2name = $_['level2name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-
-        $Formatted = switch ($Routine) {
-            AddIfAbsent {
-                $List = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Add  = $_ | Format-ExtendedProperty -Routine 'Add'  -Excute:$Execute -ValidateInput:$ValidateInput
-                $Formatted = "IF (NOT EXISTS($List)) BEGIN $Add END"
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
                 }
                 $Formatted
             }
             AddOrUpdate {
-<<<<<<< HEAD
                 $List   = $ExtendedProperty | Format-ExtendedProperty -Routine 'List'   -Execute -ValidateInput:$ValidateInput
                 $Add    = $ExtendedProperty | Format-ExtendedProperty -Routine 'Add'    -Execute -ValidateInput:$ValidateInput
                 $Update = $ExtendedProperty | Format-ExtendedProperty -Routine 'Update' -Execute -ValidateInput:$ValidateInput
-=======
-                $List   = $_ | Format-ExtendedProperty -Routine 'List'   -Excute:$Execute -ValidateInput:$ValidateInput
-                $Add    = $_ | Format-ExtendedProperty -Routine 'Add'    -Excute:$Execute -ValidateInput:$ValidateInput
-                $Update = $_ | Format-ExtendedProperty -Routine 'Update' -Excute:$Execute -ValidateInput:$ValidateInput
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                 $Formatted = "IF (EXISTS($List)) BEGIN $Update END ELSE BEGIN $Add END"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
@@ -682,13 +523,8 @@ begin {
                 $Formatted
             }
             DropIfPresent {
-<<<<<<< HEAD
                 $List = $ExtendedProperty | Format-ExtendedProperty -Routine 'List' -Execute -ValidateInput:$ValidateInput
                 $Drop = $ExtendedProperty | Format-ExtendedProperty -Routine 'Drop' -Execute -ValidateInput:$ValidateInput
-=======
-                $List = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Drop = $_ | Format-ExtendedProperty -Routine 'Drop' -Excute:$Execute -ValidateInput:$ValidateInput
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                 $Formatted = "IF (EXISTS($List)) BEGIN $Drop END"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
@@ -696,13 +532,8 @@ begin {
                 $Formatted
             }
             ListOrAdd {
-<<<<<<< HEAD
                 $List = $ExtendedProperty | Format-ExtendedProperty -Routine 'List' -Execute -ValidateInput:$ValidateInput
                 $Add  = $ExtendedProperty | Format-ExtendedProperty -Routine 'Add'  -Execute -ValidateInput:$ValidateInput
-=======
-                $List = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Add  = $_ | Format-ExtendedProperty -Routine 'Add'    -Excute:$Execute -ValidateInput:$ValidateInput
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                 $Formatted = "IF (NOT EXISTS($List)) BEGIN $Add END"
                 $Listed = $List
                 if ($SqlCmd) {
@@ -713,13 +544,8 @@ begin {
                 $Formatted
             }
             UpdateIfPresent {
-<<<<<<< HEAD
                 $List   = $ExtendedProperty | Format-ExtendedProperty -Routine 'List'   -Execute -ValidateInput:$ValidateInput
                 $Update = $ExtendedProperty | Format-ExtendedProperty -Routine 'Update' -Execute -ValidateInput:$ValidateInput
-=======
-                $List   = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Update = $_ | Format-ExtendedProperty -Routine 'Update' -Excute:$Execute -ValidateInput:$ValidateInput
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                 $Formatted = "IF (EXISTS($List)) BEGIN $Update END"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
@@ -727,7 +553,6 @@ begin {
                 $Formatted
             }
             default {
-<<<<<<< HEAD
                 $name       = $ExtendedProperty['name']       | Format-Quoted @FORMAT_ARGUMENT_LIST
                 $value      = $ExtendedProperty['value']      | Format-Quoted @FORMAT_ARGUMENT_LIST
                 $level0type = $ExtendedProperty['level0type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
@@ -737,8 +562,6 @@ begin {
                 $level2type = $ExtendedProperty['level2type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
                 $level2name = $ExtendedProperty['level2name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
 
-=======
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                 $IdArgs = switch ($Routine) {
                     Add    { $name, $value }
                     Drop   { $name }
@@ -753,25 +576,17 @@ begin {
                 $Formatted = switch ($Routine) {
                     Add    { "sys.sp_addextendedproperty $ArgumentString" }
                     Drop   { "sys.sp_dropextendedproperty $ArgumentString" }
-<<<<<<< HEAD
                     List   { "sys.fn_listextendedproperty($ArgumentString)" }
-=======
-                    List   { "sys.fn_listextendedproperty $ArgumentString" }
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
                     Update { "sys.sp_updateextendedproperty $ArgumentString" }
                     default { throw "Error, unrecognized extended property routine type: `"$Routine`"" }
                 }
 
                 if ($Execute) {
-<<<<<<< HEAD
                     if ($Routine -eq 'List') {
                         $Formatted = "SELECT * FROM $Formatted"
                     } else {
                         $Formatted = "EXECUTE $Formatted"
                     }
-=======
-                    $Formatted = "EXECUTE $Formatted"
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
 
                     if ($SqlCmd) {
                         $Formatted = "$Formatted;$($ENDL)GO"
@@ -798,7 +613,6 @@ begin {
     $ImportExcelArgumentList = @{
         Path = $InputExcelPath
     }
-<<<<<<< HEAD
     if ($WorksheetName) {
         $ImportExcelArgumentList.Add('WorksheetName', $WorksheetName)
     }
@@ -812,15 +626,6 @@ begin {
     $NoClobber = [bool] $NoClobber
     $SkipNullValues = [bool] $SkipNullValues
     $ValidateInput = [bool] $ValiateInput
-=======
-    if ($null -eq $WorksheetName) {
-        $ImportExcelArgumentList.Add('WorksheetName', $WorksheetName)
-    }
-
-    $Append = [bool] $Append
-    $NoClobber = [bool] $NoClobber
-    $SkipNullValues = [bool] $SkipNullValues
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
     #endregion Initialize Script
 }
 process {
@@ -835,11 +640,7 @@ process {
             return $_
         } |
         Where-Object { -not $SkipNullValues -or $null -ne $_['value'] } |
-<<<<<<< HEAD
         Format-ExtendedProperty -Routine $Routine -Execute:$Execute -SqlCmd:$SqlCmd -ValidateInput:$ValidateInput |
-=======
-        Format-ExtendedProperty -Execute -SqlCmd -Routine 'Add' |
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
         Join-String $ENDL |
         Out-File $OutputScriptPath -Append:$Append -NoClobber:$NoClobber
 }
