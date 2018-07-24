@@ -100,7 +100,7 @@ param (
 
     [Parameter()]
     [ValidateScript({$_ -ge 0})]
-    [Integer]
+    [Int]
     $EndRow,
 
     [Parameter()]

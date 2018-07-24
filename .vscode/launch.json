@@ -30,6 +30,7 @@
             "args": [
                 "-InputExcelPath", "\"E:\\Dropbox (Trintech)\\Architecture\\Projects\\Data Dictionary\\ReconNET\\ReconNET 9.3\\ReconNET 9.3 Data Dictionary.xlsx\"",
                 "-WorksheetName", "\"Extensible Objects\"",
+                "-EndRow", "1000",
                 "-OutputScriptPath", "\"E:\\My Temp\\ExtendedPropertiesScript.sql\"",
                 "-Defaults", "@{ level0type='SCHEMA'; level0name='uaroperator' }",
                 "-ExcludeColumns", "@( 'basetype', '_notes' )",
