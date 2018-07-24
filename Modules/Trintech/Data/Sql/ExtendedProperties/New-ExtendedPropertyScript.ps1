@@ -4,12 +4,16 @@
 .DESCRIPTION
     Creates a T-SQL extended property script from an Excel file of possibly
     pivoted extended property definitions, and writes the created script to a
-    file.
+    file. Unless the SqlCmd switch is set, the output will consist of exactly
+    one complete extended property routine invocation per line.
 .PARAMETER InputExcelPath
     The path of the input Excel file.
 .PARAMETER WorksheetName
     The name of the worksheet to extract from the Excel file. If not specified,
     then the first worksheet is extracted.
+.PARAMETER EndRow
+    The row in the input Excel file worksheet at which the import is stopped. If
+    not specified, then all rows are imported. May not be negative.
 .PARAMETER OutputScriptPath
     The full name of the file to which to output the extended property script.
     If not specified, then the output is written to a file in the present
@@ -48,6 +52,17 @@
     This filter is applied subsequent to the application of the Defaults,
     Overrides, and IncludeColumns. ExcludeColumns that do not exist do not cause
     an error to be thrown.
+.PARAMETER ValidateInput
+    Indicates that each extended property will validated. This test is applied
+    subsequence to the Defaults, Overrides, IncludeColumns, ExcludeColumns, and
+    normalization.
+.PARAMETER Execute
+    Indicates that each scripted extended property routine invocation definition
+    will be prefaced with the T-SQL `EXECUTE` command.
+.PARAMETER SqlCmd
+    Indicates that each scripted extended property routine EXECUTE statement
+    will be formatted for SqlCmd (i.e. a semicolon, LF, CR, and "GO" will be
+    appended). Only functions if the Execute switch is also set.
 .PARAMETER Append
     Indicates that if the output script file already exists, then it is appended
     to rather than overwritten.
@@ -74,6 +89,11 @@ param (
     $WorksheetName,
 
     [Parameter()]
+    [ValidateScript({$_ -ge 0})]
+    [Integer]
+    $EndRow,
+
+    [Parameter()]
     [ValidateNotNullOrEmpty()]
     [String]
     [Alias('OutPath')]
@@ -81,7 +101,7 @@ param (
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [EnhancedExtendedPropertyRoutine]
+    # [EnhancedExtendedPropertyRoutine]  # FIXME type is not yet defined
     $Routine = 'AddOrUpdate',
 
     [Parameter()]
@@ -102,7 +122,19 @@ param (
     [Parameter()]
     [ValidateNotNull()]
     [Array]
-    $ExcludeColumns = @( 'basetype', '_notes' ),
+    $ExcludeColumns = @( ),
+
+    [Parameter()]
+    [Switch]
+    $ValidateInput,
+
+    [Parameter()]
+    [Switch]
+    $Execute,
+
+    [Parameter()]
+    [Switch]
+    $SqlCmd,
 
     [Parameter()]
     [Switch]
@@ -114,7 +146,7 @@ param (
 
     [Parameter()]
     [Switch]
-    $SkipNullValuess
+    $SkipNullValues
 )
 begin {
     #region Imports
@@ -145,7 +177,7 @@ begin {
         RightQuote = ''''
         EscapeSequence = ''''
         ValueIfNull = 'NULL'
-        PassThruIfNotString = $true
+        PassThruIfNotString = $false
     }
     #endregion Constants
 
@@ -457,29 +489,22 @@ begin {
             throw "Error, extended property is not valid for routine `"$Routine`": $_"
         }
 
-        $name       = $_['name']       | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $value      = $_['value']      | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level0type = $_['level0type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level0name = $_['level0name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level1type = $_['level1type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level1name = $_['level1name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level2type = $_['level2type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
-        $level2name = $_['level2name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+        $ExtendedProperty = $_
 
         $Formatted = switch ($Routine) {
             AddIfAbsent {
-                $List = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Add  = $_ | Format-ExtendedProperty -Routine 'Add'  -Excute:$Execute -ValidateInput:$ValidateInput
-                $Formatted = "IF (NOT EXISTS($List)) BEGIN $Add END"
+                $List = $ExtendedProperty | Format-ExtendedProperty -Routine 'List' -Execute -ValidateInput:$ValidateInput
+                $Add  = $ExtendedProperty | Format-ExtendedPropeerty -Routine 'Add' -Execute -ValidateInput:$ValidateInput
+                $Formatted = "IF (NOT EXISTS($List)) BEGIN $Ad eEND"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
                 }
                 $Formatted
             }
             AddOrUpdate {
-                $List   = $_ | Format-ExtendedProperty -Routine 'List'   -Excute:$Execute -ValidateInput:$ValidateInput
-                $Add    = $_ | Format-ExtendedProperty -Routine 'Add'    -Excute:$Execute -ValidateInput:$ValidateInput
-                $Update = $_ | Format-ExtendedProperty -Routine 'Update' -Excute:$Execute -ValidateInput:$ValidateInput
+                $List   = $ExtendedProperty | Format-ExtendedProperty -Routine 'List'   -Execute -ValidateInput:$ValidateInput
+                $Add    = $ExtendedProperty | Format-ExtendedProperty -Routine 'Add'    -Execute -ValidateInput:$ValidateInput
+                $Update = $ExtendedProperty | Format-ExtendedProperty -Routine 'Update' -Execute -ValidateInput:$ValidateInput
                 $Formatted = "IF (EXISTS($List)) BEGIN $Update END ELSE BEGIN $Add END"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
@@ -487,8 +512,8 @@ begin {
                 $Formatted
             }
             DropIfPresent {
-                $List = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Drop = $_ | Format-ExtendedProperty -Routine 'Drop' -Excute:$Execute -ValidateInput:$ValidateInput
+                $List = $ExtendedProperty | Format-ExtendedProperty -Routine 'List' -Execute -ValidateInput:$ValidateInput
+                $Drop = $ExtendedProperty | Format-ExtendedProperty -Routine 'Drop' -Execute -ValidateInput:$ValidateInput
                 $Formatted = "IF (EXISTS($List)) BEGIN $Drop END"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
@@ -496,8 +521,8 @@ begin {
                 $Formatted
             }
             ListOrAdd {
-                $List = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Add  = $_ | Format-ExtendedProperty -Routine 'Add'    -Excute:$Execute -ValidateInput:$ValidateInput
+                $List = $ExtendedProperty | Format-ExtendedProperty -Routine 'List' -Execute -ValidateInput:$ValidateInput
+                $Add  = $ExtendedProperty | Format-ExtendedProperty -Routine 'Add'  -Execute -ValidateInput:$ValidateInput
                 $Formatted = "IF (NOT EXISTS($List)) BEGIN $Add END"
                 $Listed = $List
                 if ($SqlCmd) {
@@ -508,8 +533,8 @@ begin {
                 $Formatted
             }
             UpdateIfPresent {
-                $List   = $_ | Format-ExtendedProperty -Routine 'List' -Excute:$Execute -ValidateInput:$ValidateInput
-                $Update = $_ | Format-ExtendedProperty -Routine 'Update' -Excute:$Execute -ValidateInput:$ValidateInput
+                $List   = $ExtendedProperty | Format-ExtendedProperty -Routine 'List'   -Execute -ValidateInput:$ValidateInput
+                $Update = $ExtendedProperty | Format-ExtendedProperty -Routine 'Update' -Execute -ValidateInput:$ValidateInput
                 $Formatted = "IF (EXISTS($List)) BEGIN $Update END"
                 if ($SqlCmd) {
                     $Formatted = "$Formatted;$($ENDL)GO"
@@ -517,6 +542,15 @@ begin {
                 $Formatted
             }
             default {
+                $name       = $ExtendedProperty['name']       | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $value      = $ExtendedProperty['value']      | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $level0type = $ExtendedProperty['level0type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $level0name = $ExtendedProperty['level0name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $level1type = $ExtendedProperty['level1type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $level1name = $ExtendedProperty['level1name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $level2type = $ExtendedProperty['level2type'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+                $level2name = $ExtendedProperty['level2name'] | Format-Quoted @FORMAT_ARGUMENT_LIST
+
                 $IdArgs = switch ($Routine) {
                     Add    { $name, $value }
                     Drop   { $name }
@@ -531,13 +565,17 @@ begin {
                 $Formatted = switch ($Routine) {
                     Add    { "sys.sp_addextendedproperty $ArgumentString" }
                     Drop   { "sys.sp_dropextendedproperty $ArgumentString" }
-                    List   { "sys.fn_listextendedproperty $ArgumentString" }
+                    List   { "sys.fn_listextendedproperty($ArgumentString)" }
                     Update { "sys.sp_updateextendedproperty $ArgumentString" }
                     default { throw "Error, unrecognized extended property routine type: `"$Routine`"" }
                 }
 
                 if ($Execute) {
-                    $Formatted = "EXECUTE $Formatted"
+                    if ($Routine -eq 'List') {
+                        $Formatted = "SELECT * FROM $Formatted"
+                    } else {
+                        $Formatted = "EXECUTE $Formatted"
+                    }
 
                     if ($SqlCmd) {
                         $Formatted = "$Formatted;$($ENDL)GO"
@@ -564,13 +602,19 @@ begin {
     $ImportExcelArgumentList = @{
         Path = $InputExcelPath
     }
-    if ($null -eq $WorksheetName) {
+    if ($WorksheetName) {
         $ImportExcelArgumentList.Add('WorksheetName', $WorksheetName)
     }
+    if ($EndRow) {
+        $ImportExcelArgumentList.Add('EndRow', $EndRow)
+    }
 
+    $Execute = [bool] $Execute
+    $SqlCmd = [bool] $SqlCmd
     $Append = [bool] $Append
     $NoClobber = [bool] $NoClobber
     $SkipNullValues = [bool] $SkipNullValues
+    $ValidateInput = [bool] $ValiateInput
     #endregion Initialize Script
 }
 process {
@@ -585,7 +629,7 @@ process {
             return $_
         } |
         Where-Object { -not $SkipNullValues -or $null -ne $_['value'] } |
-        Format-ExtendedProperty -Execute -SqlCmd -Routine 'Add' |
+        Format-ExtendedProperty -Routine $Routine -Execute:$Execute -SqlCmd:$SqlCmd -ValidateInput:$ValidateInput |
         Join-String $ENDL |
         Out-File $OutputScriptPath -Append:$Append -NoClobber:$NoClobber
 }

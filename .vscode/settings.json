@@ -1,0 +1,16 @@
+{
+    "launch": {
+        "configurations": [
+            {
+                "type": "PowerShell",
+                "request": "launch",
+                "name": "PowerShell Launch Current File w/Args Prompt",
+                "script": "\"${file}\"",
+                "args": [
+                    "${command:SpecifyScriptArgs}"
+                ],
+                "cwd": "\"${fileDirname}\""
+            },
+        ]
+    }
+}
