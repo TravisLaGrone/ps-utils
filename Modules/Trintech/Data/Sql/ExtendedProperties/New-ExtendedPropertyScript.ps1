@@ -4,23 +4,16 @@
 .DESCRIPTION
     Creates a T-SQL extended property script from an Excel file of possibly
     pivoted extended property definitions, and writes the created script to a
-<<<<<<< HEAD
     file. Unless the SqlCmd switch is set, the output will consist of exactly
     one complete extended property routine invocation per line.
-=======
-    file.
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
 .PARAMETER InputExcelPath
     The path of the input Excel file.
 .PARAMETER WorksheetName
     The name of the worksheet to extract from the Excel file. If not specified,
     then the first worksheet is extracted.
-<<<<<<< HEAD
 .PARAMETER EndRow
     The row in the input Excel file worksheet at which the import is stopped. If
     not specified, then all rows are imported. May not be negative.
-=======
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
 .PARAMETER OutputScriptPath
     The full name of the file to which to output the extended property script.
     If not specified, then the output is written to a file in the present
@@ -59,7 +52,6 @@
     This filter is applied subsequent to the application of the Defaults,
     Overrides, and IncludeColumns. ExcludeColumns that do not exist do not cause
     an error to be thrown.
-<<<<<<< HEAD
 .PARAMETER ValidateInput
     Indicates that each extended property will validated. This test is applied
     subsequence to the Defaults, Overrides, IncludeColumns, ExcludeColumns, and
@@ -71,8 +63,6 @@
     Indicates that each scripted extended property routine EXECUTE statement
     will be formatted for SqlCmd (i.e. a semicolon, LF, CR, and "GO" will be
     appended). Only functions if the Execute switch is also set.
-=======
->>>>>>> 09b15d2168584aa12f64ed6504ec2cc81001e06e
 .PARAMETER Append
     Indicates that if the output script file already exists, then it is appended
     to rather than overwritten.
