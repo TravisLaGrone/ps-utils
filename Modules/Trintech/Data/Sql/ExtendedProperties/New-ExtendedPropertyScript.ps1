@@ -20,7 +20,9 @@
     working directory named "ExtendedPropertyScript.sql".
 .PARAMETER Routine
     The T-SQL extended property routine or composition of routines to generate
-    for each inputted extended property.
+    for each inputted extended property. One of "Add", "AddIfAbsent",
+    "AddOrUpdate", "Drop", "DropIfPresent", "List", "ListOrAdd", "Update", or
+    "UpdateIfPresent"
 .PARAMETER Defaults
     The default fields and their values to create and assign to them for fields
     that do not have a corresponding column in the inputted Excel file. Fields
@@ -101,6 +103,7 @@ param (
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
+    [String]
     # [EnhancedExtendedPropertyRoutine]  # FIXME type is not yet defined
     $Routine = 'AddOrUpdate',
 
