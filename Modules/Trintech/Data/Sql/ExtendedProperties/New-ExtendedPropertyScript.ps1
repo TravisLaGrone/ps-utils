@@ -71,8 +71,9 @@
 .PARAMETER NoClobber
     Indicates that an existing file will not be overwritten. However, it may be
     appended to if the Append switch it set.
-.PARAMETER SkipNullValuess
+.PARAMETER KeepNullValues
     Indicates that extended properties whose "value" field is `null` will be
+    kept. Otherwise, all extended properties with a `null` "value" field are
     skipped. This filter is applied subsequent to the application of the Defaults,
     Overrides, IncludeColumns, and ExcludeColumns, as well as normalization.
 #>
@@ -149,7 +150,7 @@ param (
 
     [Parameter()]
     [Switch]
-    $SkipNullValues
+    $KeepNullValues
 )
 begin {
     #region Imports
@@ -617,7 +618,7 @@ begin {
     $SqlCmd = [bool] $SqlCmd
     $Append = [bool] $Append
     $NoClobber = [bool] $NoClobber
-    $SkipNullValues = [bool] $SkipNullValues
+    $KeepNullValues = [bool] $KeepNullValues
     $ValidateInput = [bool] $ValiateInput
     #endregion Initialize Script
 }
@@ -632,7 +633,7 @@ process {
             }
             return $_
         } |
-        Where-Object { -not $SkipNullValues -or $null -ne $_['value'] } |
+        Where-Object { $KeepNullValues -or $null -ne $_['value'] } |
         Format-ExtendedProperty -Routine $Routine -Execute:$Execute -SqlCmd:$SqlCmd -ValidateInput:$ValidateInput |
         Join-String $ENDL |
         Out-File $OutputScriptPath -Append:$Append -NoClobber:$NoClobber
