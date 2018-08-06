@@ -19,7 +19,7 @@ function Add-SourceFile([String[]]$Path) {
 
         if ($SourcePath -notlike '*.cs') { throw 'Add-SourceFile only supports the C# language.' }
 
-        [Void]$CompilationUnit.AppendLine([IO.File]::ReadAllText("$PSScriptRoot\$SourcePath"))
+        [Void]$CompilationUnit.AppendLine([IO.File]::ReadAllText("$PSScriptRoot\Source\$SourcePath"))
         [Void]$CompilationUnit.AppendLine()
 
     }

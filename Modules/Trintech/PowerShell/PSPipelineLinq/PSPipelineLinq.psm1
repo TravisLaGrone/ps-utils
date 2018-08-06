@@ -22,7 +22,6 @@ enum QueryType {
 	Distinct
 	ElementAt
 	ElementAtOrDefault
-	Empty
 	Except
 	First
 	FirstOrDefault
@@ -38,6 +37,7 @@ enum QueryType {
 	OrderBy
 	OrderByDescending
 	Prepend
+	PrependMany
 	Range
 	Repeat
 	Reverse
@@ -63,7 +63,7 @@ enum QueryType {
 	Zip
 }
 
-function Invoke-PSLinq
+function Invoke-PSPipelineLinq
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -81,70 +81,70 @@ function Invoke-PSLinq
 	)
 	end {
 		switch (QueryType) {
-			Aggregate { $Input | Invoke-PSLinqAggregate @Arguments }
-			All { $Input | Invoke-PSLinqAll @Arguments }
-			Any { $Input | Invoke-PSLinqAny @Arguments }
-			Append { $Input | Invoke-PSLinqAppend @Arguments }
-			AppendMany { $Input | Invoke-PSLinqAppendMany @Arguments }
-			AsEnumerable { $Input | Invoke-PSLinqAsEnumerable @Arguments }
-			Average { $Input | Invoke-PSLinqAverage @Arguments }
-			Concat { $Input | Invoke-PSLinqConcat @Arguments }
-			ConcatMany { $Input | Invoke-PSLinqConcatMany @Arguments }
-			Contains { $Input | Invoke-PSLinqContains @Arguments }
-			ContainsAll { $Input | Invoke-PSLinqContainsAll @Arguments }
-			ContainsAny { $Input | Invoke-PSLinqContainsAny @Arguments }
-			Count { $Input | Invoke-PSLinqCount @Arguments }
-			DefaultIfEmpty { $Input | Invoke-PSLinqDefaultIfEmpty @Arguments }
-			Distinct { $Input | Invoke-PSLinqDistinct @Arguments }
-			ElementAt { $Input | Invoke-PSLinqElementAt @Arguments }
-			ElementAtOrDefault { $Input | Invoke-PSLinqElementAtOrDefault @Arguments }
-			Empty { $Input | Invoke-PSLinqEmpty @Arguments }
-			Except { $Input | Invoke-PSLinqExcept @Arguments }
-			First { $Input | Invoke-PSLinqFirst @Arguments }
-			FirstOrDefault { $Input | Invoke-PSLinqFirstOrDefault @Arguments }
-			GroupBy { $Input | Invoke-PSLinqGroupBy @Arguments }
-			GroupJoin { $Input | Invoke-PSLinqGroupJoin @Arguments }
-			Intersect { $Input | Invoke-PSLinqIntersect @Arguments }
-			Join { $Input | Invoke-PSLinqJoin @Arguments }
-			Last { $Input | Invoke-PSLinqLast @Arguments }
-			LastOrDefault { $Input | Invoke-PSLinqLastOrDefault @Arguments }
-			Max { $Input | Invoke-PSLinqMax @Arguments }
-			Min { $Input | Invoke-PSLinqMin @Arguments }
-			OfType { $Input | Invoke-PSLinqOfType @Arguments }
-			OrderBy { $Input | Invoke-PSLinqOrderBy @Arguments }
-			OrderByDescending { $Input | Invoke-PSLinqOrderByDescending @Arguments }
-			Prepend { $Input | Invoke-PSLinqPrepend @Arguments }
-			Range { $Input | Invoke-PSLinqRange @Arguments }
-			Repeat { $Input | Invoke-PSLinqRepeat @Arguments }
-			Reverse { $Input | Invoke-PSLinqReverse @Arguments }
-			Select { $Input | Invoke-PSLinqSelect @Arguments }
-			SelectMany { $Input | Invoke-PSLinqSelectMany @Arguments }
-			SequenceEqual { $Input | Invoke-PSLinqSequenceEqual @Arguments }
-			Single { $Input | Invoke-PSLinqSingle @Arguments }
-			SingleOrDefault { $Input | Invoke-PSLinqSingleOrDefault @Arguments }
-			Skip { $Input | Invoke-PSLinqSkip @Arguments }
-			SkipLast { $Input | Invoke-PSLinqSkipLast @Arguments }
-			SkipWhile { $Input | Invoke-PSLinqSkipWhile @Arguments }
-			Sum { $Input | Invoke-PSLinqSum @Arguments }
-			Take { $Input | Invoke-PSLinqTake @Arguments }
-			TakeLast { $Input | Invoke-PSLinqTakeLast @Arguments }
-			TakeWhile { $Input | Invoke-PSLinqTakeWhile @Arguments }
-			ToArray { $Input | Invoke-PSLinqToArray @Arguments }
-			ToDictionary { $Input | Invoke-PSLinqToDictionary @Arguments }
-			ToHashSet { $Input | Invoke-PSLinqToHashSet @Arguments }
-			ToList { $Input | Invoke-PSLinqToList @Arguments }
-			ToLookup { $Input | Invoke-PSLinqToLookup @Arguments }
-			Union { $Input | Invoke-PSLinqUnion @Arguments }
-			Where_ { $Input | Invoke-PSLinqWhere_ @Arguments }
-			Zip { $Input | Invoke-PSLinqZip @Arguments }
+			Aggregate { $Input | Invoke-PSPipelineLinqAggregate @Arguments }
+			All { $Input | Invoke-PSPipelineLinqAll @Arguments }
+			Any { $Input | Invoke-PSPipelineLinqAny @Arguments }
+			Append { $Input | Invoke-PSPipelineLinqAppend @Arguments }
+			AppendMany { $Input | Invoke-PSPipelineLinqAppendMany @Arguments }
+			AsEnumerable { $Input | Invoke-PSPipelineLinqAsEnumerable @Arguments }
+			Average { $Input | Invoke-PSPipelineLinqAverage @Arguments }
+			Concat { $Input | Invoke-PSPipelineLinqConcat @Arguments }
+			ConcatMany { $Input | Invoke-PSPipelineLinqConcatMany @Arguments }
+			Contains { $Input | Invoke-PSPipelineLinqContains @Arguments }
+			ContainsAll { $Input | Invoke-PSPipelineLinqContainsAll @Arguments }
+			ContainsAny { $Input | Invoke-PSPipelineLinqContainsAny @Arguments }
+			Count { $Input | Invoke-PSPipelineLinqCount @Arguments }
+			DefaultIfEmpty { $Input | Invoke-PSPipelineLinqDefaultIfEmpty @Arguments }
+			Distinct { $Input | Invoke-PSPipelineLinqDistinct @Arguments }
+			ElementAt { $Input | Invoke-PSPipelineLinqElementAt @Arguments }
+			ElementAtOrDefault { $Input | Invoke-PSPipelineLinqElementAtOrDefault @Arguments }
+			Except { $Input | Invoke-PSPipelineLinqExcept @Arguments }
+			First { $Input | Invoke-PSPipelineLinqFirst @Arguments }
+			FirstOrDefault { $Input | Invoke-PSPipelineLinqFirstOrDefault @Arguments }
+			GroupBy { $Input | Invoke-PSPipelineLinqGroupBy @Arguments }
+			GroupJoin { $Input | Invoke-PSPipelineLinqGroupJoin @Arguments }
+			Intersect { $Input | Invoke-PSPipelineLinqIntersect @Arguments }
+			Join { $Input | Invoke-PSPipelineLinqJoin @Arguments }
+			Last { $Input | Invoke-PSPipelineLinqLast @Arguments }
+			LastOrDefault { $Input | Invoke-PSPipelineLinqLastOrDefault @Arguments }
+			Max { $Input | Invoke-PSPipelineLinqMax @Arguments }
+			Min { $Input | Invoke-PSPipelineLinqMin @Arguments }
+			OfType { $Input | Invoke-PSPipelineLinqOfType @Arguments }
+			OrderBy { $Input | Invoke-PSPipelineLinqOrderBy @Arguments }
+			OrderByDescending { $Input | Invoke-PSPipelineLinqOrderByDescending @Arguments }
+			Prepend { $Input | Invoke-PSPipelineLinqPrepend @Arguments }
+			PrependMany { $Input | Invoke-PSPipelineLinqPrependMany @Arguments }
+			Range { $Input | Invoke-PSPipelineLinqRange @Arguments }
+			Repeat { $Input | Invoke-PSPipelineLinqRepeat @Arguments }
+			Reverse { $Input | Invoke-PSPipelineLinqReverse @Arguments }
+			Select { $Input | Invoke-PSPipelineLinqSelect @Arguments }
+			SelectMany { $Input | Invoke-PSPipelineLinqSelectMany @Arguments }
+			SequenceEqual { $Input | Invoke-PSPipelineLinqSequenceEqual @Arguments }
+			Single { $Input | Invoke-PSPipelineLinqSingle @Arguments }
+			SingleOrDefault { $Input | Invoke-PSPipelineLinqSingleOrDefault @Arguments }
+			Skip { $Input | Invoke-PSPipelineLinqSkip @Arguments }
+			SkipLast { $Input | Invoke-PSPipelineLinqSkipLast @Arguments }
+			SkipWhile { $Input | Invoke-PSPipelineLinqSkipWhile @Arguments }
+			Sum { $Input | Invoke-PSPipelineLinqSum @Arguments }
+			Take { $Input | Invoke-PSPipelineLinqTake @Arguments }
+			TakeLast { $Input | Invoke-PSPipelineLinqTakeLast @Arguments }
+			TakeWhile { $Input | Invoke-PSPipelineLinqTakeWhile @Arguments }
+			ToArray { $Input | Invoke-PSPipelineLinqToArray @Arguments }
+			ToDictionary { $Input | Invoke-PSPipelineLinqToDictionary @Arguments }
+			ToHashSet { $Input | Invoke-PSPipelineLinqToHashSet @Arguments }
+			ToList { $Input | Invoke-PSPipelineLinqToList @Arguments }
+			ToLookup { $Input | Invoke-PSPipelineLinqToLookup @Arguments }
+			Union { $Input | Invoke-PSPipelineLinqUnion @Arguments }
+			Where_ { $Input | Invoke-PSPipelineLinqWhere @Arguments }
+			Zip { $Input | Invoke-PSPipelineLinqZip @Arguments }
 			default { throw "Unrecognized query type: ""$QueryType""" }
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinq')
+$ExportFunctions.Add('Invoke-PSPipelineLinq')
 
 
-function Invoke-PSLinqAggregate
+function Invoke-PSPipelineLinqAggregate
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -182,11 +182,11 @@ function Invoke-PSLinqAggregate
         return $Result
     }
 }
-$ExportFunctions.Add('Invoke-PSLinqAggregate')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAggregate')
 $ExportAliases.Add('Query-Aggregate')
 
 
-function Invoke-PSLinqAll
+function Invoke-PSPipelineLinqAll
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -208,11 +208,11 @@ function Invoke-PSLinqAll
 		return $true
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqAll')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAll')
 $ExportAliases.Add('Query-All')
 
 
-function Invoke-PSLinqAny
+function Invoke-PSPipelineLinqAny
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -234,11 +234,11 @@ function Invoke-PSLinqAny
 		return $false
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqAny')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAny')
 $ExportAliases.Add('Query-Any')
 
 
-function Invoke-PSLinqAppend
+function Invoke-PSPipelineLinqAppend
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -255,11 +255,11 @@ function Invoke-PSLinqAppend
 		return $Element
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqAppend')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAppend')
 $ExportAliases.Add('Query-Append')
 
 
-function Invoke-PSLinqAppendMany
+function Invoke-PSPipelineLinqAppendMany
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -280,11 +280,11 @@ function Invoke-PSLinqAppendMany
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqAppendMany')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAppendMany')
 $ExportAliases.Add('Query-AppendMany')
 
 
-function Invoke-PSLinqAsEnumerable
+function Invoke-PSPipelineLinqAsEnumerable
 {
 	[CmdletBinding()]
 	param (
@@ -295,11 +295,11 @@ function Invoke-PSLinqAsEnumerable
 		return New-Object Trintech.PowerShell.Linq.EnumeratorEnumerable $Input
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqAsEnumerable')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAsEnumerable')
 $ExportAliases.Add('Query-AsEnumerable')
 
 
-function Invoke-PSLinqAverage
+function Invoke-PSPipelineLinqAverage
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -325,11 +325,11 @@ function Invoke-PSLinqAverage
 		return $Result
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqAverage')
+$ExportFunctions.Add('Invoke-PSPipelineLinqAverage')
 $ExportAliases.Add('Query-Average')
 
 
-function Invoke-PSLinqConcat
+function Invoke-PSPipelineLinqConcat
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -351,11 +351,11 @@ function Invoke-PSLinqConcat
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqConcat')
+$ExportFunctions.Add('Invoke-PSPipelineLinqConcat')
 $ExportAliases.Add('Query-Concat')
 
 
-function Invoke-PSLinqConcatMany
+function Invoke-PSPipelineLinqConcatMany
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -378,11 +378,11 @@ function Invoke-PSLinqConcatMany
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqConcatMany')
+$ExportFunctions.Add('Invoke-PSPipelineLinqConcatMany')
 $ExportAliases.Add('Query-ConcatMany')
 
 
-function Invoke-PSLinqContains
+function Invoke-PSPipelineLinqContains
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -407,11 +407,11 @@ function Invoke-PSLinqContains
 		return $false
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqContains')
+$ExportFunctions.Add('Invoke-PSPipelineLinqContains')
 $ExportAliases.Add('Query-Contains')
 
 
-function Invoke-PSLinqContainsAll
+function Invoke-PSPipelineLinqContainsAll
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -457,11 +457,11 @@ function Invoke-PSLinqContainsAll
 		return $ValuesNotContained.Count -eq 0  # need to restate this here in case of no input elements and no values
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqContainsAll')
+$ExportFunctions.Add('Invoke-PSPipelineLinqContainsAll')
 $ExportAliases.Add('Query-ContainsAll')
 
 
-function Invoke-PSLinqContainsAny
+function Invoke-PSPipelineLinqContainsAny
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -504,11 +504,11 @@ function Invoke-PSLinqContainsAny
 		return $false
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqContainsAny')
+$ExportFunctions.Add('Invoke-PSPipelineLinqContainsAny')
 $ExportAliases.Add('Query-ContainsAny')
 
 
-function Invoke-PSLinqCount
+function Invoke-PSPipelineLinqCount
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -531,11 +531,11 @@ function Invoke-PSLinqCount
 		return $Count
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqCount')
+$ExportFunctions.Add('Invoke-PSPipelineLinqCount')
 $ExportAliases.Add('Query-Count')
 
 
-function Invoke-PSLinqDefaultIfEmpty
+function Invoke-PSPipelineLinqDefaultIfEmpty
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -554,11 +554,11 @@ function Invoke-PSLinqDefaultIfEmpty
 		return $Result
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqDefaultIfEmpty')
+$ExportFunctions.Add('Invoke-PSPipelineLinqDefaultIfEmpty')
 $ExportAliases.Add('Query-DefaultIfEmpty')
 
 
-function Invoke-PSLinqDistinct
+function Invoke-PSPipelineLinqDistinct
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -588,11 +588,11 @@ function Invoke-PSLinqDistinct
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqDistinct')
+$ExportFunctions.Add('Invoke-PSPipelineLinqDistinct')
 $ExportAliases.Add('Query-Distinct')
 
 
-function Invoke-PSLinqElementAt
+function Invoke-PSPipelineLinqElementAt
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -620,11 +620,11 @@ function Invoke-PSLinqElementAt
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqElementAt')
+$ExportFunctions.Add('Invoke-PSPipelineLinqElementAt')
 $ExportAliases.Add('Query-ElementAt')
 
 
-function Invoke-PSLinqElementAtOrDefault
+function Invoke-PSPipelineLinqElementAtOrDefault
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -654,11 +654,11 @@ function Invoke-PSLinqElementAtOrDefault
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqElementAtOrDefault')
+$ExportFunctions.Add('Invoke-PSPipelineLinqElementAtOrDefault')
 $ExportAliases.Add('Query-ElementAtOrDefault')
 
 
-function Invoke-PSLinqExcept
+function Invoke-PSPipelineLinqExcept
 {
 	<#
 	.SYNOPSIS
@@ -705,11 +705,11 @@ function Invoke-PSLinqExcept
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqExcept')
+$ExportFunctions.Add('Invoke-PSPipelineLinqExcept')
 $ExportAliases.Add('Query-Except')
 
 
-function Invoke-PSLinqFirst
+function Invoke-PSPipelineLinqFirst
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -737,11 +737,11 @@ function Invoke-PSLinqFirst
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqFirst')
+$ExportFunctions.Add('Invoke-PSPipelineLinqFirst')
 $ExportAliases.Add('Query-First')
 
 
-function Invoke-PSLinqFirstOrDefault
+function Invoke-PSPipelineLinqFirstOrDefault
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -772,11 +772,11 @@ function Invoke-PSLinqFirstOrDefault
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqFirstOrDefault')
+$ExportFunctions.Add('Invoke-PSPipelineLinqFirstOrDefault')
 $ExportAliases.Add('Query-FirstOrDefault')
 
 
-function Invoke-PSLinqGroupBy
+function Invoke-PSPipelineLinqGroupBy
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -831,11 +831,11 @@ function Invoke-PSLinqGroupBy
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqGroupBy')
+$ExportFunctions.Add('Invoke-PSPipelineLinqGroupBy')
 $ExportAliases.Add('Query-GroupBy')
 
 
-function Invoke-PSLinqGroupJoin
+function Invoke-PSPipelineLinqGroupJoin
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -900,11 +900,11 @@ function Invoke-PSLinqGroupJoin
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqGroupJoin')
+$ExportFunctions.Add('Invoke-PSPipelineLinqGroupJoin')
 $ExportAliases.Add('Query-GroupJoin')
 
 
-function Invoke-PSLinqIntersect
+function Invoke-PSPipelineLinqIntersect
 {
 	<#
 	.SYNOPSIS
@@ -951,11 +951,11 @@ function Invoke-PSLinqIntersect
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqIntersect')
+$ExportFunctions.Add('Invoke-PSPipelineLinqIntersect')
 $ExportAliases.Add('Query-Intersect')
 
 
-function Invoke-PSLinqJoin
+function Invoke-PSPipelineLinqJoin
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1021,11 +1021,11 @@ function Invoke-PSLinqJoin
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqJoin')
+$ExportFunctions.Add('Invoke-PSPipelineLinqJoin')
 $ExportAliases.Add('Query-Join')
 
 
-function Invoke-PSLinqLast
+function Invoke-PSPipelineLinqLast
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1055,11 +1055,11 @@ function Invoke-PSLinqLast
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqLast')
+$ExportFunctions.Add('Invoke-PSPipelineLinqLast')
 $ExportAliases.Add('Query-Last')
 
 
-function Invoke-PSLinqLastOrDefault
+function Invoke-PSPipelineLinqLastOrDefault
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1092,11 +1092,11 @@ function Invoke-PSLinqLastOrDefault
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqLastOrDefault')
+$ExportFunctions.Add('Invoke-PSPipelineLinqLastOrDefault')
 $ExportAliases.Add('Query-LastOrDefault')
 
 
-function Invoke-PSLinqMax
+function Invoke-PSPipelineLinqMax
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1123,11 +1123,11 @@ function Invoke-PSLinqMax
 		return $Max
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqMax')
+$ExportFunctions.Add('Invoke-PSPipelineLinqMax')
 $ExportAliases.Add('Query-Max')
 
 
-function Invoke-PSLinqMin
+function Invoke-PSPipelineLinqMin
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1154,11 +1154,11 @@ function Invoke-PSLinqMin
 		return $Min
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqMin')
+$ExportFunctions.Add('Invoke-PSPipelineLinqMin')
 $ExportAliases.Add('Query-Min')
 
 
-function Invoke-PSLinqOfType
+function Invoke-PSPipelineLinqOfType
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1183,11 +1183,11 @@ function Invoke-PSLinqOfType
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqOfType')
+$ExportFunctions.Add('Invoke-PSPipelineLinqOfType')
 $ExportAliases.Add('Query-OfType')
 
 
-function Invoke-PSLinqOrderBy
+function Invoke-PSPipelineLinqOrderBy
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1212,11 +1212,11 @@ function Invoke-PSLinqOrderBy
 		return $Array
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqOrderBy')
+$ExportFunctions.Add('Invoke-PSPipelineLinqOrderBy')
 $ExportAliases.Add('Query-OrderBy')
 
 
-function Invoke-PSLinqOrderByDescending
+function Invoke-PSPipelineLinqOrderByDescending
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1241,11 +1241,11 @@ function Invoke-PSLinqOrderByDescending
 		return $Array
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqOrderByDescending')
+$ExportFunctions.Add('Invoke-PSPipelineLinqOrderByDescending')
 $ExportAliases.Add('Query-OrderByDescending')
 
 
-function Invoke-PSLinqPrepend
+function Invoke-PSPipelineLinqPrepend
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1262,11 +1262,11 @@ function Invoke-PSLinqPrepend
 		return $_
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqPrepend')
+$ExportFunctions.Add('Invoke-PSPipelineLinqPrepend')
 $ExportAliases.Add('Query-Prepend')
 
 
-function Invoke-PSLinqPrependMany
+function Invoke-PSPipelineLinqPrependMany
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1287,11 +1287,11 @@ function Invoke-PSLinqPrependMany
 		return $_
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqPrependMany')
+$ExportFunctions.Add('Invoke-PSPipelineLinqPrependMany')
 $ExportAliases.Add('Query-PrependMany')
 
 
-function Invoke-PSLinqRange
+function Invoke-PSPipelineLinqRange
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1320,11 +1320,11 @@ function Invoke-PSLinqRange
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqRange')
+$ExportFunctions.Add('Invoke-PSPipelineLinqRange')
 $ExportAliases.Add('Query-Range')
 
 
-function Invoke-PSLinqRepeat
+function Invoke-PSPipelineLinqRepeat
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1344,11 +1344,11 @@ function Invoke-PSLinqRepeat
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqRepeat')
+$ExportFunctions.Add('Invoke-PSPipelineLinqRepeat')
 $ExportAliases.Add('Query-Repeat')
 
 
-function Invoke-PSLinqReverse
+function Invoke-PSPipelineLinqReverse
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1362,11 +1362,11 @@ function Invoke-PSLinqReverse
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqReverse')
+$ExportFunctions.Add('Invoke-PSPipelineLinqReverse')
 $ExportAliases.Add('Query-Reverse')
 
 
-function Invoke-PSLinqSelect
+function Invoke-PSPipelineLinqSelect
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1384,11 +1384,11 @@ function Invoke-PSLinqSelect
 		return $Result
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSelect')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSelect')
 $ExportAliases.Add('Query-Select')
 
 
-function Invoke-PSLinqSelectMany
+function Invoke-PSPipelineLinqSelectMany
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1445,11 +1445,11 @@ function Invoke-PSLinqSelectMany
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSelectMany')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSelectMany')
 $ExportAliases.Add('Query-SelectMany')
 
 
-function Invoke-PSLinqSequenceEqual
+function Invoke-PSPipelineLinqSequenceEqual
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1490,11 +1490,11 @@ function Invoke-PSLinqSequenceEqual
 		return $HasNext1 -eq $HasNext2
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSequenceEqual')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSequenceEqual')
 $ExportAliases.Add('Query-SequenceEqual')
 
 
-function Invoke-PSLinqSingle
+function Invoke-PSPipelineLinqSingle
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1524,11 +1524,11 @@ function Invoke-PSLinqSingle
 		return $Match
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSingle')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSingle')
 $ExportAliases.Add('Query-Single')
 
 
-function Invoke-PSLinqSingleOrDefault
+function Invoke-PSPipelineLinqSingleOrDefault
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1562,11 +1562,11 @@ function Invoke-PSLinqSingleOrDefault
 		return $Match
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSingleOrDefault')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSingleOrDefault')
 $ExportAliases.Add('Query-SingleOrDefault')
 
 
-function Invoke-PSLinqSkip
+function Invoke-PSPipelineLinqSkip
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1589,11 +1589,11 @@ function Invoke-PSLinqSkip
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSkip')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSkip')
 $ExportAliases.Add('Query-Skip')
 
 
-function Invoke-PSLinqSkipLast
+function Invoke-PSPipelineLinqSkipLast
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1612,11 +1612,11 @@ function Invoke-PSLinqSkipLast
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSkipLast')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSkipLast')
 $ExportAliases.Add('Query-SkipLast')
 
 
-function Invoke-PSLinqSkipWhile
+function Invoke-PSPipelineLinqSkipWhile
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1657,11 +1657,11 @@ function Invoke-PSLinqSkipWhile
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSkipWhile')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSkipWhile')
 $ExportAliases.Add('Query-SkipWhile')
 
 
-function Invoke-PSLinqSum
+function Invoke-PSPipelineLinqSum
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1678,11 +1678,11 @@ function Invoke-PSLinqSum
 		return $Sum
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqSum')
+$ExportFunctions.Add('Invoke-PSPipelineLinqSum')
 $ExportAliases.Add('Query-Sum')
 
 
-function Invoke-PSLinqTake
+function Invoke-PSPipelineLinqTake
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1700,11 +1700,11 @@ function Invoke-PSLinqTake
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqTake')
+$ExportFunctions.Add('Invoke-PSPipelineLinqTake')
 $ExportAliases.Add('Query-Take')
 
 
-function Invoke-PSLinqTakeLast
+function Invoke-PSPipelineLinqTakeLast
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1722,11 +1722,11 @@ function Invoke-PSLinqTakeLast
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqTakeLast')
+$ExportFunctions.Add('Invoke-PSPipelineLinqTakeLast')
 $ExportAliases.Add('Query-TakeLast')
 
 
-function Invoke-PSLinqTakeWhile
+function Invoke-PSPipelineLinqTakeWhile
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1768,11 +1768,11 @@ function Invoke-PSLinqTakeWhile
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqTakeWhile')
+$ExportFunctions.Add('Invoke-PSPipelineLinqTakeWhile')
 $ExportAliases.Add('Query-TakeWhile')
 
 
-function Invoke-PSLinqToArray
+function Invoke-PSPipelineLinqToArray
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1784,11 +1784,11 @@ function Invoke-PSLinqToArray
 		return $Array
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqToArray')
+$ExportFunctions.Add('Invoke-PSPipelineLinqToArray')
 $ExportAliases.Add('Query-ToArray')
 
 
-function Invoke-PSLinqToDictionary
+function Invoke-PSPipelineLinqToDictionary
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1830,11 +1830,11 @@ function Invoke-PSLinqToDictionary
 		return $Dictionary
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqToDictionary')
+$ExportFunctions.Add('Invoke-PSPipelineLinqToDictionary')
 $ExportAliases.Add('Query-ToDictionary')
 
 
-function Invoke-PSLinqToHashSet
+function Invoke-PSPipelineLinqToHashSet
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1862,11 +1862,11 @@ function Invoke-PSLinqToHashSet
 		return $HashSet
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqToHashSet')
+$ExportFunctions.Add('Invoke-PSPipelineLinqToHashSet')
 $ExportAliases.Add('Query-ToHashSet')
 
 
-function Invoke-PSLinqToList
+function Invoke-PSPipelineLinqToList
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1881,11 +1881,11 @@ function Invoke-PSLinqToList
 		return $List
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqToList')
+$ExportFunctions.Add('Invoke-PSPipelineLinqToList')
 $ExportAliases.Add('Query-ToList')
 
 
-function Invoke-PSLinqToLookup
+function Invoke-PSPipelineLinqToLookup
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1927,11 +1927,11 @@ function Invoke-PSLinqToLookup
 		return $Lookup
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqToLookup')
+$ExportFunctions.Add('Invoke-PSPipelineLinqToLookup')
 $ExportAliases.Add('Query-ToLookup')
 
 
-function Invoke-PSLinqUnion
+function Invoke-PSPipelineLinqUnion
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -1980,11 +1980,11 @@ function Invoke-PSLinqUnion
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqUnion')
+$ExportFunctions.Add('Invoke-PSPipelineLinqUnion')
 $ExportAliases.Add('Query-Union')
 
 
-function Invoke-PSLinqWhere
+function Invoke-PSPipelineLinqWhere
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -2016,11 +2016,11 @@ function Invoke-PSLinqWhere
 		$Index += 1
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqWhere')
+$ExportFunctions.Add('Invoke-PSPipelineLinqWhere')
 $ExportAliases.Add('Query-Where')
 
 
-function Invoke-PSLinqZip
+function Invoke-PSPipelineLinqZip
 {
 	[CmdletBinding(PositionalBinding=$false)]
 	param (
@@ -2048,7 +2048,7 @@ function Invoke-PSLinqZip
 		}
 	}
 }
-$ExportFunctions.Add('Invoke-PSLinqZip')
+$ExportFunctions.Add('Invoke-PSPipelineLinqZip')
 $ExportAliases.Add('Query-Zip')
 
 

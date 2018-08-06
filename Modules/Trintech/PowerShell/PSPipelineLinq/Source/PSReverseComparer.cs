@@ -4,11 +4,11 @@ namespace Trintech.PowerShell.Linq
     using System.Collections.Generic;
     using System.Management.Automation;
 
-    public class PSComparer : IComparer<object>
+    public class PSReverseComparer : IComparer<object>
     {
         private Func<object,object,int> ComparisonFunction;
 
-        public PSComparer(ScriptBlock comparisonScript)
+        public PSReverseComparer(ScriptBlock comparisonScript)
         {
             this.ComparisonFunction = (x, y) => {
                 return comparisonScript.Invoke(null, x, y);
@@ -17,7 +17,7 @@ namespace Trintech.PowerShell.Linq
 
         public override int Compare(object x, object y)
         {
-            return ComparisonFunction(x, y);
+            return ComparisonFunction(y, x);
         }
     }
 }
