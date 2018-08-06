@@ -622,7 +622,7 @@ begin {
     $ValidateInput = [bool] $ValiateInput
     #endregion Initialize Script
 }
-process {
+end {
     Import-Excel @ImportExcelArgumentList |  # import raw rows as PSCustomObject; properties names are header row
         ConvertTo-HashTable -MemberTypes 'NoteProperty' |
         Set-HashTable -Defaults $Defaults -Overrides $Overrides |

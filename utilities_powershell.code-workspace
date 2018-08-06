@@ -1,0 +1,61 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"launch": {
+			"configurations": [
+				{
+					"type": "PowerShell",
+					"request": "launch",
+					"name": "PowerShell Test Current File",
+					"script": "Invoke-Pester",
+					"args": [
+						"-Script",
+						"\"${file}\""
+					],
+					"cwd": "\"${fileDirname}\""
+				},
+				{
+					"type": "PowerShell",
+					"request": "launch",
+					"name": "PowerShell Launch Current File w/Args Prompt",
+					"script": "\"${file}\"",
+					"args": [
+						"${command:SpecifyScriptArgs}"
+					],
+					"cwd": "\"${fileDirname}\""
+				},
+				{
+					"type": "PowerShell",
+					"request": "launch",
+					"name": "PowerShell Debug New-ExtendedPropertyScript",
+					"script": "E:\\My Source\\VSTS repositories\\utilities_powershell\\Modules\\Trintech\\Data\\Sql\\ExtendedProperties\\New-ExtendedPropertyScript.ps1",
+					"args": [
+						"-InputExcelPath",
+						"\"E:\\Dropbox (Trintech)\\Architecture\\Projects\\Data Dictionary\\ReconNET\\ReconNET 9.3\\ReconNET 9.3 Data Dictionary.xlsx\"",
+						"-WorksheetName",
+						"\"Extensible Objects\"",
+						"-EndRow",
+						"1000",
+						"-OutputScriptPath",
+						"\"E:\\My Temp\\ExtendedPropertiesScript.sql\"",
+						"-Defaults",
+						"@{ level0type='SCHEMA'; level0name='uaroperator' }",
+						"-ExcludeColumns",
+						"@( 'basetype', '_notes' )",
+						"-SkipNullValues"
+					],
+					"env": {
+						"DebugPreference": "Continue",
+						"ErrorActionPreference": "Inquire",
+						"WarningPreference": "Inquire"
+					}
+				}
+			],
+			"version": "0.2.0"
+		}
+	}
+}
