@@ -1,0 +1,38 @@
+{
+    "definitions": {
+        "Server": {
+            "type": "string",
+            "pattern": "(tcp:|lcp:|np:\\\\)?(.+)(,\\d+)?"
+        },
+        "Database": {
+            "type": "string",
+            "pattern": "[a-zA-Z_@#][a-zA-Z0-9_@#$]{0,127}",
+            "minLength": 1,
+            "maxLength": 128
+        },
+        "Variables": {
+            "type": "object",
+            "propertyNames": {
+                "type": "string",
+                "pattern": "[a-zA-Z_][a-zA-Z_0-9]*",
+                "minLength": 1
+            },
+            "additionalProperties": {
+                "type": "string"
+            }
+        }
+    },
+
+    "type": "object",
+    "propertyNames": { "$ref": "#/definitions/Server" },
+    "additionalProperties": {
+        "oneOf": [
+            { "$ref": "#/definitions/Variables" },
+            {
+                "type": "object",
+                "propertyNames": { "$ref": "Database" },
+                "additionalProperties": { "$ref": "#/definitions/Variables" }
+            }
+        ]
+    }
+}

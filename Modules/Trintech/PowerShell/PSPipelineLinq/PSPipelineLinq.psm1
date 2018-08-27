@@ -141,7 +141,9 @@ function Invoke-PSPipelineLinq
 		}
 	}
 }
+New-Alias -Name 'Query' -Value 'Invoke-PSPipelineLinq'
 $ExportFunctions.Add('Invoke-PSPipelineLinq')
+$ExportAliases.Add('Query')
 
 
 function Invoke-PSPipelineLinqAggregate
@@ -182,6 +184,7 @@ function Invoke-PSPipelineLinqAggregate
         return $Result
     }
 }
+New-Alias -Name 'Query-Aggregate' -Value 'Invoke-PSPipelineLinqAggregate'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAggregate')
 $ExportAliases.Add('Query-Aggregate')
 
@@ -208,6 +211,7 @@ function Invoke-PSPipelineLinqAll
 		return $true
 	}
 }
+New-Alias -Name 'Query-All' -Value 'Invoke-PSPipelineLinqAll'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAll')
 $ExportAliases.Add('Query-All')
 
@@ -234,6 +238,7 @@ function Invoke-PSPipelineLinqAny
 		return $false
 	}
 }
+New-Alias -Name 'Query-Any' -Value 'Invoke-PSPipelineLinqAny'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAny')
 $ExportAliases.Add('Query-Any')
 
@@ -255,6 +260,7 @@ function Invoke-PSPipelineLinqAppend
 		return $Element
 	}
 }
+New-Alias -Name 'Query-Append' -Value 'Invoke-PSPipelineLinqAppend'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAppend')
 $ExportAliases.Add('Query-Append')
 
@@ -280,6 +286,7 @@ function Invoke-PSPipelineLinqAppendMany
 		}
 	}
 }
+New-Alias -Name 'Query-AppendMany' -Value 'Invoke-PSPipelineLinqAppendMany'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAppendMany')
 $ExportAliases.Add('Query-AppendMany')
 
@@ -295,6 +302,7 @@ function Invoke-PSPipelineLinqAsEnumerable
 		return New-Object Trintech.PowerShell.Linq.EnumeratorEnumerable $Input
 	}
 }
+New-Alias -Name 'Query-AsEnumerable' -Value 'Invoke-PSPipelineLinqAsEnumerable'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAsEnumerable')
 $ExportAliases.Add('Query-AsEnumerable')
 
@@ -325,6 +333,7 @@ function Invoke-PSPipelineLinqAverage
 		return $Result
 	}
 }
+New-Alias -Name 'Query-Average' -Value 'Invoke-PSPipelineLinqAverage'
 $ExportFunctions.Add('Invoke-PSPipelineLinqAverage')
 $ExportAliases.Add('Query-Average')
 
@@ -351,6 +360,7 @@ function Invoke-PSPipelineLinqConcat
 		}
 	}
 }
+New-Alias -Name 'Query-Concat' -Value 'Invoke-PSPipelineLinqConcat'
 $ExportFunctions.Add('Invoke-PSPipelineLinqConcat')
 $ExportAliases.Add('Query-Concat')
 
@@ -378,6 +388,7 @@ function Invoke-PSPipelineLinqConcatMany
 		}
 	}
 }
+New-Alias -Name 'Query-ConcatMany' -Value 'Invoke-PSPipelineLinqConcatMany'
 $ExportFunctions.Add('Invoke-PSPipelineLinqConcatMany')
 $ExportAliases.Add('Query-ConcatMany')
 
@@ -407,6 +418,7 @@ function Invoke-PSPipelineLinqContains
 		return $false
 	}
 }
+New-Alias -Name 'Query-Contains' -Value 'Invoke-PSPipelineLinqContains'
 $ExportFunctions.Add('Invoke-PSPipelineLinqContains')
 $ExportAliases.Add('Query-Contains')
 
@@ -457,6 +469,7 @@ function Invoke-PSPipelineLinqContainsAll
 		return $ValuesNotContained.Count -eq 0  # need to restate this here in case of no input elements and no values
 	}
 }
+New-Alias -Name 'Query-ContainsAll' -Value 'Invoke-PSPipelineLinqContainsAll'
 $ExportFunctions.Add('Invoke-PSPipelineLinqContainsAll')
 $ExportAliases.Add('Query-ContainsAll')
 
@@ -504,6 +517,7 @@ function Invoke-PSPipelineLinqContainsAny
 		return $false
 	}
 }
+New-Alias -Name 'Query-ContainsAny' -Value 'Invoke-PSPipelineLinqContainsAny'
 $ExportFunctions.Add('Invoke-PSPipelineLinqContainsAny')
 $ExportAliases.Add('Query-ContainsAny')
 
@@ -531,6 +545,7 @@ function Invoke-PSPipelineLinqCount
 		return $Count
 	}
 }
+New-Alias -Name 'Query-Count' -Value 'Invoke-PSPipelineLinqCount'
 $ExportFunctions.Add('Invoke-PSPipelineLinqCount')
 $ExportAliases.Add('Query-Count')
 
@@ -554,6 +569,7 @@ function Invoke-PSPipelineLinqDefaultIfEmpty
 		return $Result
 	}
 }
+New-Alias -Name 'Query-DefaultIfEmpty' -Value 'Invoke-PSPipelineLinqDefaultIfEmpty'
 $ExportFunctions.Add('Invoke-PSPipelineLinqDefaultIfEmpty')
 $ExportAliases.Add('Query-DefaultIfEmpty')
 
@@ -588,6 +604,7 @@ function Invoke-PSPipelineLinqDistinct
 		}
 	}
 }
+New-Alias -Name 'Query-Distinct' -Value 'Invoke-PSPipelineLinqDistinct'
 $ExportFunctions.Add('Invoke-PSPipelineLinqDistinct')
 $ExportAliases.Add('Query-Distinct')
 
@@ -620,6 +637,7 @@ function Invoke-PSPipelineLinqElementAt
 		}
 	}
 }
+New-Alias -Name 'Query-ElementAt' -Value 'Invoke-PSPipelineLinqElementAt'
 $ExportFunctions.Add('Invoke-PSPipelineLinqElementAt')
 $ExportAliases.Add('Query-ElementAt')
 
@@ -654,6 +672,7 @@ function Invoke-PSPipelineLinqElementAtOrDefault
 		}
 	}
 }
+New-Alias -Name 'Query-ElementAtOrDefault' -Value 'Invoke-PSPipelineLinqElementAtOrDefault'
 $ExportFunctions.Add('Invoke-PSPipelineLinqElementAtOrDefault')
 $ExportAliases.Add('Query-ElementAtOrDefault')
 
@@ -705,6 +724,7 @@ function Invoke-PSPipelineLinqExcept
 		}
 	}
 }
+New-Alias -Name 'Query-Except' -Value 'Invoke-PSPipelineLinqExcept'
 $ExportFunctions.Add('Invoke-PSPipelineLinqExcept')
 $ExportAliases.Add('Query-Except')
 
@@ -737,6 +757,7 @@ function Invoke-PSPipelineLinqFirst
 		}
 	}
 }
+New-Alias -Name 'Query-First' -Value 'Invoke-PSPipelineLinqFirst'
 $ExportFunctions.Add('Invoke-PSPipelineLinqFirst')
 $ExportAliases.Add('Query-First')
 
@@ -772,6 +793,7 @@ function Invoke-PSPipelineLinqFirstOrDefault
 		}
 	}
 }
+New-Alias -Name 'Query-FirstOrDefault' -Value 'Invoke-PSPipelineLinqFirstOrDefault'
 $ExportFunctions.Add('Invoke-PSPipelineLinqFirstOrDefault')
 $ExportAliases.Add('Query-FirstOrDefault')
 
@@ -831,6 +853,7 @@ function Invoke-PSPipelineLinqGroupBy
 		}
 	}
 }
+New-Alias -Name 'Query-GroupBy' -Value 'Invoke-PSPipelineLinqGroupBy'
 $ExportFunctions.Add('Invoke-PSPipelineLinqGroupBy')
 $ExportAliases.Add('Query-GroupBy')
 
@@ -900,6 +923,7 @@ function Invoke-PSPipelineLinqGroupJoin
 		}
 	}
 }
+New-Alias -Name 'Query-GroupJoin' -Value 'Invoke-PSPipelineLinqGroupJoin'
 $ExportFunctions.Add('Invoke-PSPipelineLinqGroupJoin')
 $ExportAliases.Add('Query-GroupJoin')
 
@@ -951,6 +975,7 @@ function Invoke-PSPipelineLinqIntersect
 		}
 	}
 }
+New-Alias -Name 'Query-Intersect' -Value 'Invoke-PSPipelineLinqIntersect'
 $ExportFunctions.Add('Invoke-PSPipelineLinqIntersect')
 $ExportAliases.Add('Query-Intersect')
 
@@ -1021,6 +1046,7 @@ function Invoke-PSPipelineLinqJoin
 		}
 	}
 }
+New-Alias -Name 'Query-Join' -Value 'Invoke-PSPipelineLinqJoin'
 $ExportFunctions.Add('Invoke-PSPipelineLinqJoin')
 $ExportAliases.Add('Query-Join')
 
@@ -1055,6 +1081,7 @@ function Invoke-PSPipelineLinqLast
 		}
 	}
 }
+New-Alias -Name 'Query-Last' -Value 'Invoke-PSPipelineLinqLast'
 $ExportFunctions.Add('Invoke-PSPipelineLinqLast')
 $ExportAliases.Add('Query-Last')
 
@@ -1092,6 +1119,7 @@ function Invoke-PSPipelineLinqLastOrDefault
 		}
 	}
 }
+New-Alias -Name 'Query-LastOrDefault' -Value 'Invoke-PSPipelineLinqLastOrDefault'
 $ExportFunctions.Add('Invoke-PSPipelineLinqLastOrDefault')
 $ExportAliases.Add('Query-LastOrDefault')
 
@@ -1123,6 +1151,7 @@ function Invoke-PSPipelineLinqMax
 		return $Max
 	}
 }
+New-Alias -Name 'Query-Max' -Value 'Invoke-PSPipelineLinqMax'
 $ExportFunctions.Add('Invoke-PSPipelineLinqMax')
 $ExportAliases.Add('Query-Max')
 
@@ -1154,6 +1183,7 @@ function Invoke-PSPipelineLinqMin
 		return $Min
 	}
 }
+New-Alias -Name 'Query-Min' -Value 'Invoke-PSPipelineLinqMin'
 $ExportFunctions.Add('Invoke-PSPipelineLinqMin')
 $ExportAliases.Add('Query-Min')
 
@@ -1183,6 +1213,7 @@ function Invoke-PSPipelineLinqOfType
 		}
 	}
 }
+New-Alias -Name 'Query-OfType' -Value 'Invoke-PSPipelineLinqOfType'
 $ExportFunctions.Add('Invoke-PSPipelineLinqOfType')
 $ExportAliases.Add('Query-OfType')
 
@@ -1212,6 +1243,7 @@ function Invoke-PSPipelineLinqOrderBy
 		return $Array
 	}
 }
+New-Alias -Name 'Query-OrderBy' -Value 'Invoke-PSPipelineLinqOrderBy'
 $ExportFunctions.Add('Invoke-PSPipelineLinqOrderBy')
 $ExportAliases.Add('Query-OrderBy')
 
@@ -1241,6 +1273,7 @@ function Invoke-PSPipelineLinqOrderByDescending
 		return $Array
 	}
 }
+New-Alias -Name 'Query-OrderByDescending' -Value 'Invoke-PSPipelineLinqOrderByDescending'
 $ExportFunctions.Add('Invoke-PSPipelineLinqOrderByDescending')
 $ExportAliases.Add('Query-OrderByDescending')
 
@@ -1262,6 +1295,7 @@ function Invoke-PSPipelineLinqPrepend
 		return $_
 	}
 }
+New-Alias -Name 'Query-Prepend' -Value 'Invoke-PSPipelineLinqPrepend'
 $ExportFunctions.Add('Invoke-PSPipelineLinqPrepend')
 $ExportAliases.Add('Query-Prepend')
 
@@ -1287,6 +1321,7 @@ function Invoke-PSPipelineLinqPrependMany
 		return $_
 	}
 }
+New-Alias -Name 'Query-PrependMany' -Value 'Invoke-PSPipelineLinqPrependMany'
 $ExportFunctions.Add('Invoke-PSPipelineLinqPrependMany')
 $ExportAliases.Add('Query-PrependMany')
 
@@ -1320,6 +1355,7 @@ function Invoke-PSPipelineLinqRange
 		}
 	}
 }
+New-Alias -Name 'Query-Range' -Value 'Invoke-PSPipelineLinqRange'
 $ExportFunctions.Add('Invoke-PSPipelineLinqRange')
 $ExportAliases.Add('Query-Range')
 
@@ -1344,6 +1380,7 @@ function Invoke-PSPipelineLinqRepeat
 		}
 	}
 }
+New-Alias -Name 'Query-Repeat' -Value 'Invoke-PSPipelineLinqRepeat'
 $ExportFunctions.Add('Invoke-PSPipelineLinqRepeat')
 $ExportAliases.Add('Query-Repeat')
 
@@ -1362,6 +1399,7 @@ function Invoke-PSPipelineLinqReverse
 		}
 	}
 }
+New-Alias -Name 'Query-Reverse' -Value 'Invoke-PSPipelineLinqReverse'
 $ExportFunctions.Add('Invoke-PSPipelineLinqReverse')
 $ExportAliases.Add('Query-Reverse')
 
@@ -1384,6 +1422,7 @@ function Invoke-PSPipelineLinqSelect
 		return $Result
 	}
 }
+New-Alias -Name 'Query-Select' -Value 'Invoke-PSPipelineLinqSelect'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSelect')
 $ExportAliases.Add('Query-Select')
 
@@ -1445,6 +1484,7 @@ function Invoke-PSPipelineLinqSelectMany
 		}
 	}
 }
+New-Alias -Name 'Query-SelectMany' -Value 'Invoke-PSPipelineLinqSelectMany'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSelectMany')
 $ExportAliases.Add('Query-SelectMany')
 
@@ -1490,6 +1530,7 @@ function Invoke-PSPipelineLinqSequenceEqual
 		return $HasNext1 -eq $HasNext2
 	}
 }
+New-Alias -Name 'Query-SequenceEqual' -Value 'Invoke-PSPipelineLinqSequenceEqual'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSequenceEqual')
 $ExportAliases.Add('Query-SequenceEqual')
 
@@ -1524,6 +1565,7 @@ function Invoke-PSPipelineLinqSingle
 		return $Match
 	}
 }
+New-Alias -Name 'Query-Single' -Value 'Invoke-PSPipelineLinqSingle'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSingle')
 $ExportAliases.Add('Query-Single')
 
@@ -1562,6 +1604,7 @@ function Invoke-PSPipelineLinqSingleOrDefault
 		return $Match
 	}
 }
+New-Alias -Name 'Query-SingleOrDefault' -Value 'Invoke-PSPipelineLinqSingleOrDefault'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSingleOrDefault')
 $ExportAliases.Add('Query-SingleOrDefault')
 
@@ -1589,6 +1632,7 @@ function Invoke-PSPipelineLinqSkip
 		}
 	}
 }
+New-Alias -Name 'Query-Skip' -Value 'Invoke-PSPipelineLinqSkip'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSkip')
 $ExportAliases.Add('Query-Skip')
 
@@ -1612,6 +1656,7 @@ function Invoke-PSPipelineLinqSkipLast
 		}
 	}
 }
+New-Alias -Name 'Query-SkipLast' -Value 'Invoke-PSPipelineLinqSkipLast'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSkipLast')
 $ExportAliases.Add('Query-SkipLast')
 
@@ -1657,6 +1702,7 @@ function Invoke-PSPipelineLinqSkipWhile
 		}
 	}
 }
+New-Alias -Name 'Query-SkipWhile' -Value 'Invoke-PSPipelineLinqSkipWhile'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSkipWhile')
 $ExportAliases.Add('Query-SkipWhile')
 
@@ -1678,6 +1724,7 @@ function Invoke-PSPipelineLinqSum
 		return $Sum
 	}
 }
+New-Alias -Name 'Query-Sum' -Value 'Invoke-PSPipelineLinqSum'
 $ExportFunctions.Add('Invoke-PSPipelineLinqSum')
 $ExportAliases.Add('Query-Sum')
 
@@ -1700,6 +1747,7 @@ function Invoke-PSPipelineLinqTake
 		}
 	}
 }
+New-Alias -Name 'Query-Take' -Value 'Invoke-PSPipelineLinqTake'
 $ExportFunctions.Add('Invoke-PSPipelineLinqTake')
 $ExportAliases.Add('Query-Take')
 
@@ -1722,6 +1770,7 @@ function Invoke-PSPipelineLinqTakeLast
 		}
 	}
 }
+New-Alias -Name 'Query-TakeLast' -Value 'Invoke-PSPipelineLinqTakeLast'
 $ExportFunctions.Add('Invoke-PSPipelineLinqTakeLast')
 $ExportAliases.Add('Query-TakeLast')
 
@@ -1768,6 +1817,7 @@ function Invoke-PSPipelineLinqTakeWhile
 		}
 	}
 }
+New-Alias -Name 'Query-TakeWhile' -Value 'Invoke-PSPipelineLinqTakeWhile'
 $ExportFunctions.Add('Invoke-PSPipelineLinqTakeWhile')
 $ExportAliases.Add('Query-TakeWhile')
 
@@ -1784,6 +1834,7 @@ function Invoke-PSPipelineLinqToArray
 		return $Array
 	}
 }
+New-Alias -Name 'Query-ToArray' -Value 'Invoke-PSPipelineLinqToArray'
 $ExportFunctions.Add('Invoke-PSPipelineLinqToArray')
 $ExportAliases.Add('Query-ToArray')
 
@@ -1830,6 +1881,7 @@ function Invoke-PSPipelineLinqToDictionary
 		return $Dictionary
 	}
 }
+New-Alias -Name 'Query-ToDictionary' -Value 'Invoke-PSPipelineLinqToDictionary'
 $ExportFunctions.Add('Invoke-PSPipelineLinqToDictionary')
 $ExportAliases.Add('Query-ToDictionary')
 
@@ -1862,6 +1914,7 @@ function Invoke-PSPipelineLinqToHashSet
 		return $HashSet
 	}
 }
+New-Alias -Name 'Query-ToHashSet' -Value 'Invoke-PSPipelineLinqToHashSet'
 $ExportFunctions.Add('Invoke-PSPipelineLinqToHashSet')
 $ExportAliases.Add('Query-ToHashSet')
 
@@ -1881,6 +1934,7 @@ function Invoke-PSPipelineLinqToList
 		return $List
 	}
 }
+New-Alias -Name 'Query-ToList' -Value 'Invoke-PSPipelineLinqToList'
 $ExportFunctions.Add('Invoke-PSPipelineLinqToList')
 $ExportAliases.Add('Query-ToList')
 
@@ -1927,6 +1981,7 @@ function Invoke-PSPipelineLinqToLookup
 		return $Lookup
 	}
 }
+New-Alias -Name 'Query-ToLookup' -Value 'Invoke-PSPipelineLinqToLookup'
 $ExportFunctions.Add('Invoke-PSPipelineLinqToLookup')
 $ExportAliases.Add('Query-ToLookup')
 
@@ -1980,6 +2035,7 @@ function Invoke-PSPipelineLinqUnion
 		}
 	}
 }
+New-Alias -Name 'Query-Union' -Value 'Invoke-PSPipelineLinqUnion'
 $ExportFunctions.Add('Invoke-PSPipelineLinqUnion')
 $ExportAliases.Add('Query-Union')
 
@@ -2016,6 +2072,7 @@ function Invoke-PSPipelineLinqWhere
 		$Index += 1
 	}
 }
+New-Alias -Name 'Query-Where' -Value 'Invoke-PSPipelineLinqWhere'
 $ExportFunctions.Add('Invoke-PSPipelineLinqWhere')
 $ExportAliases.Add('Query-Where')
 
@@ -2048,6 +2105,7 @@ function Invoke-PSPipelineLinqZip
 		}
 	}
 }
+New-Alias -Name 'Query-Zip' -Value 'Invoke-PSPipelineLinqZip'
 $ExportFunctions.Add('Invoke-PSPipelineLinqZip')
 $ExportAliases.Add('Query-Zip')
 
