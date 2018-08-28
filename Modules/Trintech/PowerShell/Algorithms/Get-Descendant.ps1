@@ -33,7 +33,7 @@ function Get-Descendant
         [int]
         [ValidateNotNull()]
         [ValidateRange(0, [int]::MaxValue)]
-        $MaxDepth = [int]::MaxValue  # inclusive; zero-indexed
+        $MaxDepth = [int]::MaxValue,  # inclusive; zero-indexed
 
         [Parameter()]
         [switch]
