@@ -4,7 +4,7 @@ function Get-Descendant
 {
     [CmdletBinding(PositionalBinding=$false)]
     Param (
-        [Parameter(Mandatory, Position=1)]
+        [Parameter(ValueFromPipeline, Mandatory, Position=1)]
         [object]
         $Root,
 
@@ -62,14 +62,14 @@ function Get-Descendant
         #endregion
 
         #region Helper Functions
-        function Get-AllDescendants ($Child = $Root, $Depth = 0)
+        function Get-AllDescendants ($Node, $Depth = 0)
         {
             if ($MinDepth -le $Depth -and $Depth -le $MaxDepth) {
-                $Child | Write-Output
+                $Node | Write-Output
             }
             if ($Dept -lt $MaxDepth) {
-                foreach ($GrandChild in $ChildrenByParent[($Child | Get-Key)]) {
-                    Get-AllDescendants $GrandChild ($Depth + 1) | Write-Output
+                foreach ($Child in $ChildrenByParent[($Node | Get-Key)]) {
+                    Get-AllDescendants $Child ($Depth + 1) | Write-Output
                 }
             }
         }
@@ -87,7 +87,7 @@ function Get-Descendant
             }
         }
 
-        function Get-LeftmostDescendant
+        function Get-LeftmostDescendant ($Root)
         {
             $Leftmost = $Root
             $Depth = 0
@@ -119,7 +119,7 @@ function Get-Descendant
             }
         }
 
-        function Get-RightmostDescendant
+        function Get-RightmostDescendant ($Root)
         {
             $Rightmost = $Root
             $Depth = 0
@@ -146,7 +146,7 @@ function Get-Descendant
             }
         }
 
-        function Get-LowestDescendants ($Node, $Depth)
+        function Get-LowestDescendants ($Node, $Depth = 0)
         {
             $Lowest = [TreeNodeGroup]::new(@(, $Node), $Depth)
             if ($Depth -lt $MaxDepth) {
@@ -162,9 +162,9 @@ function Get-Descendant
             }
         }
 
-        function Get-LowestDescendantsWrapper
+        function Get-LowestDescendantsWrapper ($Root)
         {
-            $LowestGroup = Get-LowestDescendants $Root 0
+            $LowestGroup = Get-LowestDescendants $Root
             if ($MinDepth -le $LowestGroup.Depth -and $LowestGroup.Depth -le $MaxDepth) {
                 return $LowestGroup.Nodes
             }
@@ -174,7 +174,7 @@ function Get-Descendant
     Process {
         return (
             if ($Lowest) {
-                $Descendants = Get-LowestDescendantsWrapper
+                $Descendants = Get-LowestDescendantsWrapper $Root
                 if ($Leftmost) {
                     Get-Leftmost $Descendants
                 } elseif ($Rightmost) {
@@ -183,11 +183,11 @@ function Get-Descendant
                     $Descendants
                 }
             } elseif ($Leftmost) {
-                Get-LeftmostDescendant
+                Get-LeftmostDescendant $Root
             } elseif ($Rightmost) {
-                Get-RightmostDescendant
+                Get-RightmostDescendant $Root
             } else {
-                Get-AllDescendants
+                Get-AllDescendants $Root
             }
         )
     }
