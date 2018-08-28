@@ -54,12 +54,12 @@ function Get-DescendantProcess
             Get-CimInstance -query $Query |
             Group-Object -Property ParentProcessId -AsHashTable
 
-        function Get-Descendants ($ChildId, $MaxDepth)
+        function Get-Descendants ($Id = $RootId, $Depth = 0)
         {
-            if ($MaxDepth -ge 0) {
-                foreach ($GrandChildId in $ChildrenByParent[$ChildId]) {
-                    $GrandChildId | Write-Output
-                    Get-Descendants -ChildId $GrandChildId -MaxDepth ($MaxDepth - 1) | Write-Output
+            if ($Depth -lt $MaxDepth) {
+                foreach ($DescendantId in $ChildrenByParent[$Id]) {
+                    $DescendantId | Write-Output
+                    Get-Descendants $DescendantId ($Depth + 1) | Write-Output
                 }
             }
         }
@@ -67,6 +67,6 @@ function Get-DescendantProcess
         if (-not $ExcludeRootId) {
             $RootId | Write-Output
         }
-        Get-Descendants -ChildId $RootId -MaxDepth ($MaxDepth - 1) | Write-Output
+        Get-Descendants | Write-Output
     }
 }
