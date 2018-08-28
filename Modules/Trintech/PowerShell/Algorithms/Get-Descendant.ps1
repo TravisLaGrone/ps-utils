@@ -78,7 +78,7 @@ function Get-Descendant
         {
             if ($Enumerable -is [System.Collections.IList]) {
                 $List = $Enumerable -as [System.Collections.IList]
-                $List[0] | Write-Output
+                return $List[0]
             }
             else {
                 $Enumerator = $Enumerable.GetEnumerator()
@@ -106,7 +106,7 @@ function Get-Descendant
         {
             if ($Enumerable -is [System.Collections.IList]) {
                 $List = $Enumerable -as [System.Collections.IList]
-                $List[($List.Count - 1)] | Write-Output
+                return $List[($List.Count - 1)]
             }
             else {
                 $Enumerator = $Enumerable.GetEnumerator()
