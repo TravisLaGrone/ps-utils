@@ -20,7 +20,7 @@
 .OUTPUTS
     System.UInt32
         The process ID of each descendant process of RootId, subject to other
-        constraining parameters, if any.  No guarantees as made as to output order.
+        constraining parameters, if any.  No guarantees are made as to output order.
 #>
 function Get-DescendantProcess
 {
