@@ -22,7 +22,7 @@
         The process ID of each descendant process of RootId, subject to other
         constraining parameters, if any.  No guarantees as made as to output order.
 #>
-function Get-DescendantProcesses
+function Get-DescendantProcess
 {
     [CmdletBinding(PositionalBinding=$false)]
     Param (
@@ -50,19 +50,14 @@ function Get-DescendantProcesses
         if ($RequireSameSessionId) {
             $Query += " WHERE SessionId = $((Get-Process -Id $RootId).SessionId)"
         }
-
-        $ChildrenOf = [System.Collections.Generic.Dictionary[UInt32, System.Collections.ArrayList]]::new()
-        foreach ($Result in (Get-CimInstance -query $Query)) {
-            if (-not $ChildrenOf.ContainsKey($Result.ParentProcessId)) {
-                $ChildrenOf[$Result.ParentProcessId] = [System.Collections.ArrayList]::new()
-            }
-            [void] $ChildrenOf[$Result.ParentProcessId].Add($Result)
-        }
+        $ChildrenByParent = `
+            Get-CimInstance -query $Query |
+            Group-Object -Property ParentProcessId -AsHashTable
 
         function Get-Descendants ($ChildId, $MaxDepth)
         {
             if ($MaxDepth -ge 0) {
-                foreach ($GrandChildId in $ChildrenOf[$ChildId]) {
+                foreach ($GrandChildId in $ChildrenByParent[$ChildId]) {
                     $GrandChildId | Write-Output
                     Get-Descendants -ChildId $GrandChildId -MaxDepth ($MaxDepth - 1) | Write-Output
                 }
